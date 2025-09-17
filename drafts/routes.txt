@@ -1,0 +1,32 @@
+Карта страниц:
+
+/
+├── /login
+├── /register
+├── /library
+│    └── /work/new
+│    └── /work/:id
+│    └── /work/:id/edit
+│    └── /work/:id/chapter/new
+│    └── /work/:id/chapter/:chapterId
+│    └── /work/:id/chapter/:chapterId/edit
+├── /author/:id
+├── /account
+└── /admin
+
+
+Список маршрутов:
+
+/ — главная страница
+/login — вход
+/register — регистрация
+/library — каталог произведений (поиск, фильтры, теги)
+/work/new — публикация новой работы
+/work/:id — некоторое произведение
+/work/:id/edit — редактирование произведения
+/work/:id/chapter/new — добавление новой главы
+/work/:id/chapter/:chapterId — некоторая глава произведения
+/work/:id/chapter/:chapterId/edit — редактирование некоторой главы
+/author/:id — страница автора
+/account — настройки пользователя
+/admin — панель администратора
