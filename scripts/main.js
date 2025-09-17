@@ -1,25 +1,26 @@
 async function loadBooks() {
-  const response = await fetch('/data/books.json');
-  const data = await response.json();
+    // Загрузка данных из JSON
+    const response = await fetch('/data/books.json');
+    const data = await response.json();
 
-  renderBooks(data.popular, 'popular-container');
-  renderBooks(data.new, 'new-container');
-  renderBooks(data.updates, 'updates-container');
+    // Рендеринг книг в соответствующие контейнеры
+    renderBooks(data.popular, 'popular-container');
+    renderBooks(data.new, 'new-container');
+    renderBooks(data.updates, 'updates-container');
 }
 
 function renderBooks(list, containerId) {
     const container = document.getElementById(containerId);
     list.forEach(book => {
-        // Создаем HTML для информации о последней главе, если она существует
+        // Формируем информацию о последней главе для секции "Обновления"
         let chapterInfo = '';
-        if (book.latest_chapter && book.chapter_url) { // Проверяем наличие обоих полей
+        if (book.latest_chapter && book.chapter_url) {
             chapterInfo = `
-                <p class="latest-chapter">
-                    <a href="${book.chapter_url}">${book.latest_chapter}</a>
-                </p>`;
-        } else if (book.latest_chapter) { // Если URL нет, но название главы есть
-             chapterInfo = `<p class="latest-chapter">${book.latest_chapter}</p>`;
+                <p class="latest-chapter"><a href="${book.chapter_url}">${book.latest_chapter}</a></p>`;
         }
+        
+        // Определяем URL автора: если он есть, используем его, иначе "#"
+        const authorUrl = book.author_url || '#';
 
         const li = document.createElement('li');
         li.innerHTML = `
@@ -30,7 +31,7 @@ function renderBooks(list, containerId) {
                 
                 <div class="card-content">
                     <h3><a href="${book.work_url}">${book.title}</a></h3>
-                    <p>Автор: <a href="${book.author_url}">${book.author}</a></p>
+                    <p class="author">Автор: <a href="${authorUrl}">${book.author}</a></p>
                     
                     ${chapterInfo} 
                     

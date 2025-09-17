@@ -1,221 +1,301 @@
-/* Общие настройки страницы */
+/* =============== Reset / Base =============== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 95%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 body {
-    margin: 0;
-    font-family: 'Fira Code', monospace, sans-serif;
-    background-color: #0d0d0d;
-    color: #e0e0e0;
-    line-height: 1.6;
+  margin: 0;
+  font-family: 'Fira Code', monospace, system-ui, -apple-system, "Segoe UI", Roboto;
+  background-color: #0d0d0d;
+  color: #e0e0e0;
+  line-height: 1.6;
 }
 
 a {
-    color: #ff9aa2; /* пастельный красно-розовый */
-    text-decoration: none;
+  color: #ff9aa2;
+  text-decoration: none;
 }
 
 a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
-/* Шапка сайта */
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* =============== Header / Nav =============== */
 header {
-    background-color: #111;
-    padding: 1rem 2rem;
-    border-bottom: 1px solid #222;
-    display: flex;
-    flex-direction: column; /* h1 и nav идут друг под другом */
+  background-color: #111;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid #222;
+  display: flex;
+  flex-direction: column;
 }
 
 header h1 {
-    font-family: 'Courier New', monospace;
-    font-size: 2rem;
-    margin: 0 0 0.5rem 0;
-    color: #ffb3b3; 
+  font-family: 'Trebuchet MS', monospace;
+  font-size: 2rem;
+  margin: 0 0 0.5rem 0;
+  color: #ffb3b3; 
 }
 
-/* Меню навигации */
 nav {
-    display: flex; /* Основной контейнер nav */
-    justify-content: space-between; /* Разносим левое и правое меню */
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-/* Стили для навигационных списков: ГОРИЗОНТАЛЬНОЕ РАСПОЛОЖЕНИЕ */
 nav ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex; 
-    flex-wrap: nowrap;
-    gap: 2rem;
+  display: flex; 
+  gap: 2rem;
+  padding: 0;
+  margin: 0;
 }
 
 nav li {
-    display: inline-block;
-    flex: none; /* Предотвращает конфликт с общими стилями li */
+  flex: none;
 }
 
-/* Основное содержимое */
+/* =============== Main Container =============== */
 main {
-    padding: 2rem;
+  padding: 0;
 }
 
+.container {
+  width: 100%;
+  max-width: 75rem;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* =============== Hero Section =============== */
+.hero {
+  margin-bottom: 5rem; /* общий отступ */
+}
+
+.hero-text {
+  font-size: 1rem;
+  line-height: 3;
+  color: #e0e0e0;
+}
+
+/* Специально для R'lyehian текста */
+.hero-rlyehian {
+  color: #a52c34;
+  margin-top: 0.5rem;
+}
+
+/* =============== Sections =============== */
 section {
-    margin-bottom: 3rem;
+  margin-bottom: 3.5rem;
 }
 
 h2 {
-    font-family: 'Courier New', monospace;
-    border-bottom: 1px solid #222;
-    padding-bottom: 0.5rem;
-    margin-bottom: 1rem;
-    font-size: 1.5rem;
+  font-family: 'Trebuchet MS', monospace;
+  border-bottom: 1px solid #222;
+  font-size: 1.5rem;
+  padding-bottom: 0.35rem;
+  margin: 0 0 1rem 0;
 }
 
-/* Hero-секция */
-.hero-text {
-    font-size: 1.1rem;
-    margin-top: 0.5rem;
-    color: #ccc;
-}
-
-.hero-ascii {
-    display: block;
-    font-family: 'Courier New', monospace;
-    font-size: 1rem;
-    color: #ff7f87; /* пастельный красно-розовый оттенок */
-    margin-top: 0.5rem;
-}
-
-/* --- Списки карточек: Структура --- */
-
-/* Контейнеры для карточек (заменяет старый общий ul) */
+/* =============== Card Lists =============== */
 #popular-container,
 #new-container,
 #updates-container {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: flex-start;
+  align-items: stretch;
 }
 
-/* Элементы списка (li) внутри контейнеров карточек */
 #popular-container li,
 #new-container li,
 #updates-container li {
-    flex: 1 1 250px; 
+  display: block;
+  flex: 0 0 auto;
+  width: 23rem;
+  height: 14.5rem;
+  box-sizing: border-box;
 }
 
-/* Базовые стили для всех ul */
-ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-/* --- Карточки книг: Двухколоночный макет --- */
-
+/* =============== Card =============== */
 article {
-    background-color: #1a1a1a;
-    padding: 0; /* Убираем padding с article, чтобы обложка прилегала к краю */
-    border-radius: 6px;
-    border: 1px solid #222;
-    transition: transform 0.2s, box-shadow 0.2s;
-    
-    /* Flexbox для горизонтального расположения обложки и текста */
-    display: flex;
-    align-items: stretch; /* Растягивает обложку и текст на всю высоту */
-    min-height: 200px; /* Минимальная высота карточки */
+  width: 100%;
+  height: 100%;
+  background-color: #1a1a1a;
+  border-radius: 6px;
+  border: 1px solid #222;
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 article:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 12px rgba(255, 154, 162, 0.5); /* розоватая тень */
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(255, 154, 162, 0.18);
 }
 
-/* Контейнер обложки */
+/* =============== Cover =============== */
 .card-cover {
-    margin: 0; 
-    flex-shrink: 0; 
-    width: 35%; /* Ширина обложки */
-    max-width: 150px; 
-    border-right: 1px solid #222; 
+  flex: 0 0 9.375rem;
+  width: 9.375rem;
+  border-right: 1px solid #222;
+  overflow: hidden;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* Изображение обложки */
 .card-cover img {
-    width: 100%;
-    height: 100%; /* Растягиваем изображение на всю высоту figure */
-    object-fit: cover; /* Обрезает изображение */
-    border-radius: 6px 0 0 6px; /* Закругляем углы только слева */
-    display: block;
-    color: transparent; /* Скрываем alt-текст, если обложка загрузилась */
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px 0 0 6px;
 }
 
-/* Placeholder для обложки, если она не загрузилась */
-.card-cover img:before {
-    content: attr(alt);
-    display: flex; /* Flex для центрирования текста */
-    align-items: center;
-    justify-content: center;
-    color: #e0e0e0;
-    text-align: center;
-    padding: 1rem;
-    background-color: #333;
-    height: 100%; 
-    font-size: 0.9rem;
-    box-sizing: border-box; /* Важно: чтобы padding не увеличивал размер */
+/* Alt text for cover */
+.card-cover img::before {
+  content: attr(alt);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  color: #e0e0e0;
+  background-color: #333;
+  font-size: 0.9rem;
+  padding: 0.5rem;
+  box-sizing: border-box;
+  word-wrap: break-word;
+  overflow-wrap: break-word;    
+  hyphens: auto;
 }
 
-/* Текстовое содержимое справа от обложки */
+/* =============== Card Content =============== */
 .card-content {
-    padding: 1rem; /* Отступы вокруг текста */
-    flex-grow: 1; /* Занимает оставшееся место */
-    display: flex;
-    flex-direction: column; /* Элементы внутри текста идут вертикально */
-    justify-content: space-between; /* Распределяем содержимое по вертикали */
+  padding: 1rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
 }
 
-/* Сброс/Корректировка отступов внутри .card-content */
+/* Title, author, latest chapter */
+.card-content h3,
+.card-content .author,
+.card-content .latest-chapter {
+  white-space: nowrap;
+  overflow: hidden;
+  display: block;
+  margin: 0 0 0.4rem 0;
+}
+
 .card-content h3 {
-    font-size: 1.1rem;
-    margin: 0 0 0.5rem 0; /* Скорректированный отступ */
+  font-size: 1rem;
+  margin-bottom: 0.4rem;
+}
+
+/* Description */
+.card-content p.description {
+  margin-top: auto;
+  font-size: 0.90rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  overflow: hidden;
+  text-overflow: clip;
+  display: -webkit-box;
+  -webkit-line-clamp: 4; /* Максимум 4 строки */
+  -webkit-box-orient: vertical;
 }
 
 .card-content p {
-    margin: 0.3rem 0;
+  margin: 0.3rem 0;
 }
 
-.card-content p.description {
-    margin-top: auto; /* Прижимает описание к нижней части, если есть место */
+.latest-chapter a {
+  color: #e87078;
+  text-decoration: none;
 }
 
-
-
-/* --- Старые/Ненужные стили (убранные или объединенные) --- */
-
-/* Старые стили figure и img, которые были переопределены/заменены: */
-figure {
-    margin: 0; /* Теперь все figure имеют margin: 0 */
+.latest-chapter a:hover {
+  text-decoration: underline;
 }
-/* figcaption теперь удален из HTML-шаблона */
 
-
-/* Ссылки "Смотреть все" */
+/* =============== View All & Footer =============== */
 .view-all {
-    display: inline-block;
-    margin-top: 0.5rem;
-    color: #ff9aa2; 
-    font-weight: bold;
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: #ff9aa2;
+  font-weight: 700;
 }
 
-/* Подвал сайта */
 footer {
-    background-color: #111;
-    padding: 1rem 2rem;
-    border-top: 1px solid #222;
-    text-align: center;
-    font-size: 0.9rem;
-    color: #777;
+  background-color: #111;
+  padding: 1rem 2rem;
+  border-top: 1px solid #222;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #777;
+}
+
+/* =============== Responsive =============== */
+@media (max-width: 56rem) {
+  .container {
+    padding: 1.25rem;
+  }
+
+  #popular-container li,
+  #new-container li,
+  #updates-container li {
+    width: calc(50% - 0.5rem);
+  }
+
+  .card-cover {
+    flex: 0 0 7.5rem;
+    width: 7.5rem;
+  }
+}
+
+@media (max-width: 40rem) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  nav {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  #popular-container li,
+  #new-container li,
+  #updates-container li {
+    width: 100%;
+  }
+
+  .card-cover {
+    flex: 0 0 7.5rem;
+    width: 7.5rem;
+  }
 }
