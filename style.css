@@ -1,0 +1,221 @@
+/* Общие настройки страницы */
+body {
+    margin: 0;
+    font-family: 'Fira Code', monospace, sans-serif;
+    background-color: #0d0d0d;
+    color: #e0e0e0;
+    line-height: 1.6;
+}
+
+a {
+    color: #ff9aa2; /* пастельный красно-розовый */
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Шапка сайта */
+header {
+    background-color: #111;
+    padding: 1rem 2rem;
+    border-bottom: 1px solid #222;
+    display: flex;
+    flex-direction: column; /* h1 и nav идут друг под другом */
+}
+
+header h1 {
+    font-family: 'Courier New', monospace;
+    font-size: 2rem;
+    margin: 0 0 0.5rem 0;
+    color: #ffb3b3; 
+}
+
+/* Меню навигации */
+nav {
+    display: flex; /* Основной контейнер nav */
+    justify-content: space-between; /* Разносим левое и правое меню */
+    align-items: center;
+}
+
+/* Стили для навигационных списков: ГОРИЗОНТАЛЬНОЕ РАСПОЛОЖЕНИЕ */
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex; 
+    flex-wrap: nowrap;
+    gap: 2rem;
+}
+
+nav li {
+    display: inline-block;
+    flex: none; /* Предотвращает конфликт с общими стилями li */
+}
+
+/* Основное содержимое */
+main {
+    padding: 2rem;
+}
+
+section {
+    margin-bottom: 3rem;
+}
+
+h2 {
+    font-family: 'Courier New', monospace;
+    border-bottom: 1px solid #222;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+/* Hero-секция */
+.hero-text {
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+    color: #ccc;
+}
+
+.hero-ascii {
+    display: block;
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+    color: #ff7f87; /* пастельный красно-розовый оттенок */
+    margin-top: 0.5rem;
+}
+
+/* --- Списки карточек: Структура --- */
+
+/* Контейнеры для карточек (заменяет старый общий ul) */
+#popular-container,
+#new-container,
+#updates-container {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+/* Элементы списка (li) внутри контейнеров карточек */
+#popular-container li,
+#new-container li,
+#updates-container li {
+    flex: 1 1 250px; 
+}
+
+/* Базовые стили для всех ul */
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* --- Карточки книг: Двухколоночный макет --- */
+
+article {
+    background-color: #1a1a1a;
+    padding: 0; /* Убираем padding с article, чтобы обложка прилегала к краю */
+    border-radius: 6px;
+    border: 1px solid #222;
+    transition: transform 0.2s, box-shadow 0.2s;
+    
+    /* Flexbox для горизонтального расположения обложки и текста */
+    display: flex;
+    align-items: stretch; /* Растягивает обложку и текст на всю высоту */
+    min-height: 200px; /* Минимальная высота карточки */
+}
+
+article:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(255, 154, 162, 0.5); /* розоватая тень */
+}
+
+/* Контейнер обложки */
+.card-cover {
+    margin: 0; 
+    flex-shrink: 0; 
+    width: 35%; /* Ширина обложки */
+    max-width: 150px; 
+    border-right: 1px solid #222; 
+}
+
+/* Изображение обложки */
+.card-cover img {
+    width: 100%;
+    height: 100%; /* Растягиваем изображение на всю высоту figure */
+    object-fit: cover; /* Обрезает изображение */
+    border-radius: 6px 0 0 6px; /* Закругляем углы только слева */
+    display: block;
+    color: transparent; /* Скрываем alt-текст, если обложка загрузилась */
+}
+
+/* Placeholder для обложки, если она не загрузилась */
+.card-cover img:before {
+    content: attr(alt);
+    display: flex; /* Flex для центрирования текста */
+    align-items: center;
+    justify-content: center;
+    color: #e0e0e0;
+    text-align: center;
+    padding: 1rem;
+    background-color: #333;
+    height: 100%; 
+    font-size: 0.9rem;
+    box-sizing: border-box; /* Важно: чтобы padding не увеличивал размер */
+}
+
+/* Текстовое содержимое справа от обложки */
+.card-content {
+    padding: 1rem; /* Отступы вокруг текста */
+    flex-grow: 1; /* Занимает оставшееся место */
+    display: flex;
+    flex-direction: column; /* Элементы внутри текста идут вертикально */
+    justify-content: space-between; /* Распределяем содержимое по вертикали */
+}
+
+/* Сброс/Корректировка отступов внутри .card-content */
+.card-content h3 {
+    font-size: 1.1rem;
+    margin: 0 0 0.5rem 0; /* Скорректированный отступ */
+}
+
+.card-content p {
+    margin: 0.3rem 0;
+}
+
+.card-content p.description {
+    margin-top: auto; /* Прижимает описание к нижней части, если есть место */
+}
+
+
+
+/* --- Старые/Ненужные стили (убранные или объединенные) --- */
+
+/* Старые стили figure и img, которые были переопределены/заменены: */
+figure {
+    margin: 0; /* Теперь все figure имеют margin: 0 */
+}
+/* figcaption теперь удален из HTML-шаблона */
+
+
+/* Ссылки "Смотреть все" */
+.view-all {
+    display: inline-block;
+    margin-top: 0.5rem;
+    color: #ff9aa2; 
+    font-weight: bold;
+}
+
+/* Подвал сайта */
+footer {
+    background-color: #111;
+    padding: 1rem 2rem;
+    border-top: 1px solid #222;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #777;
+}

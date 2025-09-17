@@ -1,0 +1,94 @@
+{
+  "popular": [
+    {
+      "title": "Хроники пустоты",
+      "author": "Анна Писатель",
+      "author_url": "/author/3472",
+      "cover": "assets/cover1.jpg",
+      "work_url": "/work/1",
+      "description": "Эпическая сага о вечном забвении. Погружение в мир, где время остановилось."
+    },
+
+    {
+      "title": "Бездна слов",
+      "author": "Марк Творец",
+      "author_url": "/author/8193",
+      "cover": "assets/cover2.jpg",
+      "work_url": "/work/2",
+      "description": "Сборник стихов о тишине и страхе. Метафизические размышления о смысле бытия."
+    },
+
+    {
+      "title": "Шепот древних стен",
+      "author": "Елена Археолог",
+      "author_url": "/author/5501",
+      "cover": "assets/cover3.jpg",
+      "work_url": "/work/3",
+      "description": "Историческое фэнтези о затерянном городе и забытых пророчествах."
+    }
+  ],
+
+  "new": [
+    {
+      "title": "Кибернетический закат",
+      "author": "Виктор Кодер",
+      "author_url": "/author/9284",
+      "cover": "assets/cover4.jpg",
+      "work_url": "/work/4",
+      "description": "Научно-фантастический роман о восстании ИИ и поиске человечности в цифровом мире."
+    },
+
+    {
+      "title": "Лабиринт сознания",
+      "author": "София Сновидица",
+      "author_url": "/author/1075",
+      "cover": "assets/cover5.jpg",
+      "work_url": "/work/5",
+      "description": "Психологический триллер о границах реальности и иллюзорном мире снов."
+    },
+
+    {
+      "title": "Зов за гранью",
+      "author": "Дмитрий Эзотерик",
+      "author_url": "/author/6390",
+      "cover": "assets/cover6.jpg",
+      "work_url": "/work/6",
+      "description": "Мистический рассказ о тайнах оккультизма и неизведанных силах."
+    }
+  ],
+
+  "updates": [
+    {
+      "title": "Путешествие по осколкам",
+      "author": "Игорь Странник",
+      "author_url": "/author/4855",
+      "cover": "assets/cover7.jpg",
+      "work_url": "/work/7",
+      "description": "Фантастическая повесть о временных парадоксах.",
+      "latest_chapter": "Глава 15: Зеркало прошлого",
+      "chapter_url": "/work/7/chapter/15"
+    },
+
+    {
+      "title": "Черный карнавал",
+      "author": "Мария Театр",
+      "author_url": "/author/2119",
+      "cover": "assets/cover8.jpg",
+      "work_url": "/work/8",
+      "description": "Нуарный детектив с оккультной тематикой.",
+      "latest_chapter": "Глава 4: Развязка маски",
+      "chapter_url": "/work/8/chapter/4"
+    },
+
+    {
+      "title": "Алгоритмы одиночества",
+      "author": "Алексей Инженер",
+      "author_url": "/author/7641",
+      "cover": "assets/cover9.jpg",
+      "work_url": "/work/9",
+      "description": "Социальная драма о влиянии технологий на отношения.",
+      "latest_chapter": "Глава 22: Финал кода",
+      "chapter_url": "/work/9/chapter/22"
+    }
+  ]
+}
