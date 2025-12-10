@@ -4,19 +4,19 @@ async function loadBooks() {
     const data = await response.json();
 
     // Рендеринг книг в соответствующие контейнеры
-    renderBooks(data.popular, 'popular-container');
     renderBooks(data.new, 'new-container');
     renderBooks(data.updates, 'updates-container');
 }
 
 function renderBooks(list, containerId) {
     const container = document.getElementById(containerId);
+    const fragment = document.createDocumentFragment();
     list.forEach(book => {
         // Формируем информацию о последней главе для секции "Обновления"
         let chapterInfo = '';
         if (book.latest_chapter && book.chapter_url) {
             chapterInfo = `
-                <p class="latest-chapter"><a href="${book.chapter_url}">${book.latest_chapter}</a></p>`;
+                <a class="book-chapter" href="${book.chapter_url}">${book.latest_chapter}</a>`;
         }
         
         // Определяем URL автора: если он есть, используем его, иначе "#"
@@ -26,21 +26,21 @@ function renderBooks(list, containerId) {
         li.innerHTML = `
             <article>
                 <figure class="card-cover">
-                    <img src="${book.cover}" alt="Обложка книги ${book.title}">
+                    <img src="${book.cover}" alt="${book.title} - обложка">
                 </figure>
                 
                 <div class="card-content">
-                    <h3><a href="${book.work_url}">${book.title}</a></h3>
-                    <p class="author">Автор: <a href="${authorUrl}">${book.author}</a></p>
+                    <a class="book-title" href="${book.work_url}">${book.title}</a>
+                    <a class="book-author" href="${authorUrl}">${book.author}</a>
                     
-                    ${chapterInfo} 
-                    
-                    <p class="description">${book.description}</p>
+                    ${chapterInfo}
                 </div>
             </article>
         `;
-        container.appendChild(li);
+        fragment.appendChild(li);
     });
+
+    container.appendChild(fragment);
 }
 
 loadBooks();
