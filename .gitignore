@@ -1,1 +1,7 @@
-# Nothing
+node_modules/
+npm-debug.log
+*.db
+*.sqlite
+storage/
+.env
+.DS_Store
