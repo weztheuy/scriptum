@@ -1,0 +1,72 @@
+wScriptum - Majestic Monolith/
+├── .gitignore
+├── README.md
+├── dev.db
+├── drafts/
+│   ├── roles.md
+│   ├── routes.md
+│   ├── seeds/
+│   │   ├── seed20-1.js
+│   │   ├── seed20-20.js
+│   │   └── seed4-8.js
+│   └── structure.md
+├── drizzle.config.js
+├── package-lock.json
+├── package.json
+├── public/
+│   ├── assets/
+│   │   ├── default-avatar.png
+│   │   ├── default-cover.png
+│   │   └── logo.svg
+│   ├── css/
+│   │   └── style.css
+│   ├── jss/
+│   └── uploads/
+│       ├── avatars/
+│       └── covers/
+│           ├── cover_1766350930133.webp
+│           └── cover_1766379934736.webp
+└── src/
+    ├── modules/
+    │   ├── auth/
+    │   │   └── auth.routes.js
+    │   ├── authors/
+    │   ├── chapters/
+    │   ├── comments/
+    │   ├── downloader/
+    │   ├── settings/
+    │   └── works/
+    ├── server.js
+    ├── shared/
+    │   ├── db.js
+    │   └── schema.js
+    └── views/
+        ├── layout.ejs
+        ├── pages/
+        │   ├── auth/
+        │   │   ├── login.ejs
+        │   │   └── register.ejs
+        │   ├── authors/
+        │   │   ├── author.ejs
+        │   │   └── authors.ejs
+        │   ├── chapters/
+        │   │   ├── chapter-form.ejs
+        │   │   └── chapter.ejs
+        │   ├── home/
+        │   │   └── home.ejs
+        │   ├── settings/
+        │   │   ├── account.ejs
+        │   │   ├── privacy.ejs
+        │   │   └── profile.ejs
+        │   └── works/
+        │       ├── work-form.ejs
+        │       ├── work.ejs
+        │       └── works.ejs
+        └── partials/
+            ├── cards/
+            │   ├── author-card.ejs
+            │   └── work-card.ejs
+            ├── comments/
+            │   └── comment.ejs
+            └── ui/
+                └── pagination-profile.ejs

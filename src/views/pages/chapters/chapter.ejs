@@ -1,0 +1,249 @@
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<div class="reader-page" x-data="{ 
+    fontSize: 15, /* Базовый размер из стиля формы */
+    content: `<%- chapter.content.replace(/`/g, '\\`').replace(/\$/g, '\\$') %>`,
+    
+    get renderedContent() {
+        return typeof marked !== 'undefined' ? marked.parse(this.content) : this.content;
+    }
+}">
+    <header class="reader-nav">
+        <div class="nav-container">
+            <a href="/works/<%= work.id %>?tab=chapters" class="nav-back">
+                ← <span class="work-name"><%= work.title.toUpperCase() %></span>
+            </a>
+            
+            <div class="reader-tools">
+                <button @click="if(fontSize > 12) fontSize -= 2" class="tool-btn">A-</button>
+                <button @click="if(fontSize < 32) fontSize += 2" class="tool-btn">A+</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="reader-main">
+        <div class="reader-content-box">
+            <h1 class="chapter-title" :style="{ fontSize: (fontSize + 7) + 'px' }">
+                <%= chapter.title %>
+            </h1>
+            
+            <article 
+                class="chapter-text markdown-body" 
+                x-html="renderedContent"
+                :style="{ fontSize: fontSize + 'px' }"
+            ></article>
+        </div>
+    </main>
+
+    <footer class="reader-footer">
+        <div class="nav-container pagination-row">
+            <% if (prevId) { %>
+                <a href="/works/<%= work.id %>/chapters/<%= prevId %>" class="pag-btn">НАЗАД</a>
+            <% } else { %>
+                <span class="pag-btn disabled">НАЗАД</span>
+            <% } %>
+
+            <a href="/works/<%= work.id %>?tab=chapters" class="pag-btn text-link">К СОДЕРЖАНИЮ</a>
+
+            <% if (nextId) { %>
+                <a href="/works/<%= work.id %>/chapters/<%= nextId %>" class="pag-btn">ВПЕРЕД</a>
+            <% } else { %>
+                <span class="pag-btn disabled">ВПЕРЕД</span>
+            <% } %>
+        </div>
+    </footer>
+
+    <div class="reader-comments-wrap">
+
+            <%- include('../../partials/comments/comment.ejs', { 
+                comments: comments, 
+                item: work, 
+                chapter: chapter,
+                user: user 
+            }) %>
+
+            <% if (totalPages > 1) { %>
+                <div class="pagination-wrap">
+                    <% if (currentPage > 1) { %>
+                        <a href="?page=<%= currentPage - 1 %>" class="pag-link">← НАЗАД</a>
+                    <% } %>
+                    
+                    <div class="pag-info">СЕГМЕНТ <%= currentPage %> / <%= totalPages %></div>
+                    
+                    <% if (currentPage < totalPages) { %>
+                        <a href="?page=<%= currentPage + 1 %>" class="pag-link">ВПЕРЕД →</a>
+                    <% } %>
+                </div>
+            <% } %>
+
+    </div>
+</div>
+
+<style>
+.reader-page { 
+    min-height: 100vh; 
+    background: var(--bg-main); 
+    display: flex; 
+    flex-direction: column; 
+    color: var(--text-main);
+}
+
+.reader-nav {
+    position: sticky;
+    top: 0;
+    background: var(--bg-main);
+    border-bottom: var(--border-hard);
+    z-index: 100;
+    padding: 15px 0;
+}
+
+.nav-container {
+    max-width: 900px; /* Согласовано с шириной формы */
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.reader-main { 
+    flex: 1; 
+    max-width: 1000px;
+    margin: 40px auto; 
+    padding: 0 24px; 
+    width: 100%;
+}
+
+/* Контейнер текста, имитирующий превью из формы */
+.reader-content-box {
+    background: #050505; 
+    border: 1px solid #1a1a1a; 
+    padding: 60px; /* Увеличенные отступы для эффекта книги */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.chapter-title { 
+    font-size: 22px; 
+    letter-spacing: 2px; 
+    text-align: center; 
+    margin-bottom: 40px; 
+    color: #fff; 
+    padding-bottom: 20px; 
+    border-bottom: 1px solid #1a1a1a;
+    font-family: inherit;
+}
+
+/* Стилизация контента из chapter-form.ejs */
+.markdown-body { 
+    line-height: 1.8; 
+    color: #ccc;
+    font-size: 15px;
+    text-align: justify;
+}
+
+.markdown-body p { 
+    margin-bottom: 1.2em; 
+}
+
+.markdown-body h1, .markdown-body h2, .markdown-body h3 { 
+    color: #fff; 
+    margin-top: 1.5em; 
+    margin-bottom: 0.5em;
+    font-weight: normal;
+}
+
+.markdown-body strong { color: var(--accent); }
+.markdown-body em { color: #fff; }
+
+.reader-footer {
+    background: var(--bg-main);
+    border-top: var(--border-hard);
+    padding: 20px 0;
+}
+
+.pagination-row { display: flex; gap: 15px; }
+
+.pag-btn { 
+    padding: 12px 20px; 
+    border: 1px solid #1a1a1a; 
+    color: var(--text-main); 
+    text-decoration: none; 
+    font-size: 10px; 
+    letter-spacing: 2px; 
+    transition: 0.3s;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #050505;
+}
+
+.pag-btn.text-link { 
+    border: none; 
+    background: none;
+    font-weight: bold; 
+    color: var(--accent); 
+    flex: 1.5; 
+}
+
+.pag-btn:hover:not(.disabled) { 
+    border-color: var(--accent); 
+    color: var(--accent); 
+}
+
+.pag-btn.disabled { opacity: 0.15; cursor: not-allowed; }
+
+.nav-back { text-decoration: none; color: var(--text-muted); font-size: 11px; letter-spacing: 2px; }
+.nav-back:hover { color: var(--accent); }
+
+.tool-btn { 
+    background: #050505; 
+    border: 1px solid #1a1a1a; 
+    color: var(--text-muted); 
+    padding: 6px 14px; 
+    cursor: pointer; 
+    font-size: 10px; 
+    transition: 0.2s;
+}
+.tool-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+.reader-comments-wrap {
+    margin: 0 0 46px 0;
+}
+
+.pagination-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    margin-top: 40px;
+    padding: 25px;
+    border: 1px solid #111;
+    background: #020202;
+}
+
+.pag-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-family: monospace;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    transition: 0.3s;
+}
+
+.pag-link:hover { text-shadow: 0 0 10px var(--accent); }
+
+.pag-info {
+    color: #444;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+@media (max-width: 768px) {
+    .reader-content-box { padding: 30px 20px; border: none; }
+    .reader-main { margin: 0; padding: 0; }
+    .pagination-row { flex-direction: column; }
+}
+</style>

@@ -1,14 +1,30 @@
 {
-  "name": "wscriptum-backend",
-  "version": "0.0.1",
-  "type": "commonjs",
+  "name": "w-scriptum",
+  "version": "0.9.0",
+  "description": "Платформа для публикации и чтения",
+  "main": "src/server.js",
+  "type": "module",
   "scripts": {
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "db:push": "drizzle-kit push"
   },
   "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "cookie-parser": "^1.4.6",
-    "express": "^4.18.2",
-    "jsonwebtoken": "^9.0.0"
+    "@fastify/cookie": "^11.0.2",
+    "@fastify/multipart": "^9.0.1",
+    "@fastify/formbody": "^8.0.2",
+    "@fastify/session": "^11.1.1",
+    "@fastify/static": "^8.0.4",
+    "@fastify/view": "^10.0.2",
+    "@libsql/client": "^0.14.0",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.7",
+    "drizzle-orm": "^0.38.2",
+    "ejs": "^3.1.10",
+    "fastify": "^5.2.0",
+    "sharp": "^0.34.5"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.30.1"
   }
 }

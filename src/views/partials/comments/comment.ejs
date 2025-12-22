@@ -1,0 +1,282 @@
+<% 
+// Улучшенный парсер контента
+function parseContent(text) {
+    if (!text) return '';
+    // Сначала экранируем HTML, чтобы избежать XSS
+    let escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    
+    return escaped
+        // Упоминания через @id
+        .replace(/@id(\d+)/g, '<a href="/authors/$1" class="mention-link">@ID_$1</a>')
+        // Ссылки на комментарии >>id (теперь работают)
+        .replace(/&gt;&gt;id(\d+)/g, '<a href="#comment-$1" class="mention-link reply-link">>>ID_$1</a>');
+}
+%>
+
+<section class="comments-section" x-data="{ 
+    newComment: '', 
+    isSubmitting: false,
+    async post() {
+        if(!this.newComment.trim() || this.isSubmitting) return;
+        this.isSubmitting = true;
+        const res = await fetch('/comments', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ 
+                content: this.newComment, 
+                workId: '<%= item.id %>', 
+                chapterId: '<%= typeof chapter !== 'undefined' ? chapter.id : '' %>' 
+            })
+        });
+        if(res.ok) window.location.reload();
+        this.isSubmitting = false;
+    },
+    async deleteComment(id) {
+        if(!confirm('УДАЛИТЬ ДАННЫЙ ОТПЕЧАТОК?')) return;
+        const res = await fetch(`/comments/${id}`, { method: 'DELETE' });
+        if(res.ok) window.location.reload();
+    }
+}">
+    <% if (user) { %>
+        <div class="terminal-input-wrap">
+            <textarea x-model="newComment" placeholder="Используйте @id1 для ссылки на автора и >>id1 для ссылки на комментарий"></textarea>
+            <div style="display: flex; justify-content: flex-end; margin-top: 15px;">
+                <button @click="post()" :disabled="isSubmitting" class="btn-send">
+                    <span x-show="!isSubmitting">ВЫПОЛНИТЬ ПРОВЕДЕНИЕ</span>
+                    <span x-show="isSubmitting">ПРОЦЕСС...</span>
+                </button>
+            </div>
+        </div>
+    <% } %>
+
+    <div class="comments-list">
+        <% if (locals.comments && comments.length > 0) { %>
+            <% comments.forEach(comment => { %>
+                <div class="comment-block" id="comment-<%= comment.id %>" x-data="{ 
+                    likes: <%= comment.likesCount || 0 %>, 
+                    isLiked: <%= !!comment.userHasLiked %>,
+                    async toggleLike() {
+                        const res = await fetch('/comments/<%= comment.id %>/like', { method: 'POST' });
+                        if(res.ok) {
+                            const data = await res.json();
+                            this.likes = data.likes;
+                            this.isLiked = data.isLiked;
+                        }
+                    },
+                    copyId() {
+                        navigator.clipboard.writeText('>>id<%= comment.id %>');
+                        alert('ID скопирован в буфер');
+                    }
+                }">
+                    <div class="c-header">
+                        <div class="c-header-left">
+                            <a href="/authors/<%= comment.userId %>" class="c-username">
+                                <%= comment.userPublicName || 'НЕИЗВЕСТЕН' %>
+                            </a>
+                            
+                            <% if (comment.userId === item.authorId) { %>
+                                <span class="author-badge">АВТОР</span>
+                            <% } %>
+                        </div>
+                        
+                        <div class="c-header-right">
+                            <button @click="copyId()" class="c-tool" title="ОТВЕТИТЬ">[/]</button>
+                            <span class="c-date">[<%= new Date(comment.createdAt).toLocaleString() %>]</span>
+                            <span class="c-id">ID:<%= comment.id %></span>
+                            
+                            <% if (user && (user.id === comment.userId || user.id === item.authorId)) { %>
+                                <button @click="deleteComment(<%= comment.id %>)" class="c-del" title="УДАЛИТЬ">✕</button>
+                            <% } %>
+                        </div>
+                    </div>
+                    
+                    <div class="c-content"><%- parseContent(comment.content) %></div>
+                    
+                    <div class="c-footer">
+                        <button @click="toggleLike()" :class="isLiked ? 'liked' : ''" class="like-btn" 
+                                :disabled="<%= user && user.id === comment.userId %>">
+                            <span x-text="isLiked ? '●' : '○'"></span> ПОДТВЕРДИТЬ [<span x-text="likes"></span>]
+                        </button>
+                    </div>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <div class="empty-state">БУДЬТЕ ПЕРВЫМ, КТО ОСТАВИТ СВОЙ ОТПЕЧАТОК.</div>
+        <% } %>
+    </div>
+</section>
+
+<style>
+/* Заголовок секции */
+.terminal-header {
+    font-size: 11px;
+    color: #666; /* Сделал ярче */
+    letter-spacing: 3px;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #1a1a1a;
+    padding-bottom: 8px;
+    text-transform: uppercase;
+}
+
+/* Рамка комментария */
+.comment-block { 
+    border: 1px solid #1a1a1a; /* Добавил полноценную рамку */
+    background: #050505;
+    padding: 20px;
+    margin-bottom: 15px;
+    transition: 0.2s ease;
+}
+
+/* Ховер без градиента */
+.comment-block:hover {
+    background: #0a0a0a;
+    border-color: #333;
+}
+
+/* Если на комментарий перешли по ссылке >>id */
+.comment-block:target {
+    border-color: var(--accent);
+    background: #0d0000;
+}
+
+/* Шапка комментария */
+.c-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #111;
+}
+
+.c-header-left, .c-header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Автор и статус */
+.c-username { 
+    color: var(--accent); 
+    text-decoration: none; 
+    font-size: 16px; 
+    font-weight: bold; 
+    transition: 0.2s;
+    cursor: pointer;
+}
+.c-username:hover { 
+    text-decoration: underline; 
+}
+
+.author-badge {
+    background: rgba(255, 68, 68, 0.1);
+    border: 1px solid #ff4444;
+    color: #ff4444;
+    padding: 3px 8px;
+    font-size: 9px;
+    letter-spacing: 2px;
+    font-weight: bold;
+}
+
+/* Системные надписи (ярче) */
+.c-date { color: #888; font-size: 12px; font-family: monospace; }
+.c-id { color: #555; font-size: 12px; font-weight: bold; font-family: monospace; }
+
+/* Кнопки действий */
+.c-tool, .c-del {
+    background: none;
+    border: 1px solid #222;
+    cursor: pointer;
+    font-family: monospace;
+    transition: 0.2s;
+    color: #888;
+    padding: 2px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.c-tool:hover { border-color: var(--accent); color: var(--accent); }
+.c-del:hover { border-color: #ff4444; color: #ff4444; background: rgba(255, 68, 68, 0.05); }
+
+/* Контент */
+.c-content { 
+    color: #ccc; /* Яркий текст */
+    font-family: 'Courier New', monospace; 
+    font-size: 15px; 
+    line-height: 1.6; 
+    white-space: pre-wrap;
+    margin: 15px 0;
+    word-break: break-word;
+}
+
+/* Ссылки внутри текста */
+.mention-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: bold;
+    border-bottom: 1px solid transparent;
+}
+.mention-link:hover {
+    border-bottom: 1px solid var(--accent);
+}
+
+/* Кнопка лайка */
+.like-btn { 
+    background: none; 
+    border: 1px solid #222;
+    color: #666; 
+    cursor: pointer; 
+    font-size: 11px; 
+    padding: 6px 15px;
+    transition: 0.2s;
+    letter-spacing: 1px;
+    font-family: inherit;
+    font-weight: bold;
+}
+.like-btn:hover:not(:disabled) { border-color: #444; color: #aaa; }
+.like-btn.liked { color: var(--accent); border-color: var(--accent); background: rgba(var(--accent-rgb), 0.05); }
+.like-btn:disabled { cursor: default; }
+
+/* Поле ввода */
+.terminal-input-wrap { 
+    border: 1px solid #1a1a1a; 
+    background: #020202; 
+    padding: 20px; 
+    margin-bottom: 40px; 
+}
+.terminal-input-wrap textarea { 
+    width: 100%; 
+    background: transparent; 
+    border: none; 
+    color: #eee; 
+    font-family: 'Courier New', monospace; 
+    outline: none; 
+    resize: vertical; 
+    min-height: 80px;
+    font-size: 15px;
+}
+
+.btn-send {
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 10px 25px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.btn-send:hover {
+    background: var(--accent);
+    color: #000;
+}
+
+.empty-state {
+    border: 1px solid var(--accent);
+    padding: 20px 25px;
+    color: var(--accent);
+    opacity: 0.7;
+}
+</style>

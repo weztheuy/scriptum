@@ -1,0 +1,391 @@
+<div class="work-page" x-data="{ 
+    tab: 'comments', 
+    shelfOpen: false, 
+    selectedShelf: 'В КОЛЛЕКЦИЮ',
+    loading: false,
+
+    init() {
+        // Считываем ?tab= из URL
+        const params = new URLSearchParams(window.location.search);
+        const urlTab = params.get('tab');
+        if (urlTab === 'comments' || urlTab === 'chapters') {
+            this.tab = urlTab;
+        }
+
+        // Следим за кнопками назад/вперед
+        window.addEventListener('popstate', (event) => {
+            const params = new URLSearchParams(window.location.search);
+            this.tab = params.get('tab') || 'comments';
+        });
+    },
+
+    switchTab(newTab) {
+        if (this.tab === newTab) return;
+        
+        // Эффект загрузки (скелетон)
+        this.loading = true;
+        this.tab = newTab;
+        
+        // Обновляем URL без перезагрузки
+        const url = new URL(window.location);
+        url.searchParams.set('tab', newTab);
+        history.pushState({}, '', url);
+
+        // Имитируем небольшую задержку для плавности «скелетона»
+        setTimeout(() => { this.loading = false; }, 300);
+    }
+}">
+    <section class="work-header section" style="display: flex; gap: 40px; border-bottom: var(--border-hard); padding-bottom: 40px;">
+        <div class="work-cover-large" style="flex: 0 0 300px; height: 450px; border: var(--border-hard); display: flex; align-items: center; justify-content: center; background: #0a0a0a;">
+            <% if (item.coverUrl) { %>
+                <img src="<%= item.coverUrl %>" style="width: 100%; height: 100%; object-fit: cover;">
+            <% } else { %>
+                <span style="color: var(--accent)">NO COVER</span>
+            <% } %>
+        </div>
+
+        <div class="work-info" style="flex: 1; display: flex; flex-direction: column;">
+            <% if (!item.isPublic) { %>
+                <div style="background: rgba(255, 68, 68, 0.1); border: 1px solid #ff4444; color: #ff4444; padding: 5px 12px; font-size: 10px; letter-spacing: 2px; width: fit-content; margin-bottom: 15px; font-weight: bold;">
+                    ЧЕРНОВИК
+                </div>
+            <% } %>
+
+            <h1 class="title" style="font-size: 42px; margin-bottom: 10px;"><%= item.title %></h1>
+            
+            <div style="margin-bottom: 20px;">
+                <a class="author-link" href="/authors/<%= item.authorId %>" style="color: var(--accent); text-decoration: none; font-size: 18px;">
+                    <%= authorName %>
+                </a>
+            </div>
+
+            <div class="work-metadata" style="margin-bottom: 25px; display: flex; flex-direction: column; gap: 8px;">
+                <div style="font-size: 12px; letter-spacing: 1px;">
+                    <span style="color: var(--text-muted);">ЖАНРЫ:</span>
+                    <% if (genres && genres.length > 0) { %>
+                        <% genres.forEach(g => { %>
+                            <a href="/works?&genres=<%= g.id %>" style="color: var(--accent); text-decoration: none; margin-left: 10px; border-bottom: 1px solid transparent; transition: 0.2s;" onmouseover="this.style.borderBottom='1px solid var(--accent)'" onmouseout="this.style.borderBottom='1px solid transparent'">
+                                <%= g.name.toUpperCase() %>
+                            </a>
+                        <% }) %>
+                    <% } else { %>
+                        <span style="color: #333; margin-left: 10px;">НЕ УКАЗАНЫ</span>
+                    <% } %>
+                </div>
+                
+                <div style="font-size: 12px; letter-spacing: 1px;">
+                    <span style="color: var(--text-muted);">МЕТКИ:</span>
+                    <% if (tags && tags.length > 0) { %>
+                        <% tags.forEach(t => { %>
+                            <a href="/works?&tags=<%= t.id %>" style="color: var(--text-main); text-decoration: none; margin-left: 10px; opacity: 0.8;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">
+                                #<%= t.name.toUpperCase() %>
+                            </a>
+                        <% }) %>
+                    <% } else { %>
+                        <span style="color: #333; margin-left: 10px;">НЕТ МЕТОК</span>
+                    <% } %>
+                </div>
+            </div>
+
+            <div class="rating-system" x-data="{ 
+                currentAvg: '<%= displayRating || '0.0' %>', 
+                userRating: <%= Number(userRating) || 0 %>,
+                hoverRating: 0,
+                isAuthor: <%= Boolean(isAuthor) %>,
+                isGuest: <%= !user %>,
+                
+                get isReadOnly() { return this.isAuthor || this.isGuest; },
+
+                async rate(i) {
+                    if (this.isAuthor) return;
+                    if (this.isGuest) { alert('Войдите, чтобы оценить'); return; }
+                    
+                    this.userRating = i; 
+                    try {
+                        const res = await fetch(`/works/<%= item.id %>/rate`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ score: i })
+                        });
+                        const data = await res.json();
+                        if(data.newAvg) this.currentAvg = data.newAvg;
+                    } catch (e) { console.error(e); }
+                },
+
+                async removeRating() {
+                    const res = await fetch(`/works/<%= item.id %>/rate`, { method: 'DELETE' });
+                    const data = await res.json();
+                    if(data.success) {
+                        this.userRating = 0;
+                        this.currentAvg = data.newAvg;
+                    }
+                }
+            }" style="margin-bottom: 20px; display: flex; align-items: center; gap: 15px;">
+                
+                <span style="color: var(--text-muted); font-size: 14px;">ОЦЕНКА:</span>
+                <div style="display: flex; gap: 5px;">
+                    <template x-for="i in 5">
+                        <button 
+                            type="button"
+                            @click="rate(i)"
+                            @mouseenter="if(!isReadOnly) hoverRating = i"
+                            @mouseleave="if(!isReadOnly) hoverRating = 0"
+                            class="rating-box"
+                            :style="{ 
+                                cursor: isReadOnly ? 'default' : 'pointer',
+                                color: (isReadOnly ? (Math.floor(parseFloat(currentAvg)) >= i) : (hoverRating || userRating) >= i) ? 'var(--accent)' : '#333',
+                                borderColor: (isReadOnly ? (Math.floor(parseFloat(currentAvg)) >= i) : (hoverRating || userRating) >= i) ? 'var(--accent)' : '#333'
+                            }"
+                        >★</button>
+                    </template>
+                </div>
+
+                <% if (user) { %>
+                    <button 
+                        x-show="userRating > 0 && !isAuthor" 
+                        @click="removeRating()"
+                        title="Очистить оценку"
+                        class="rating-box"
+                        style="color: #666; border-color: #333; display: flex; align-items: center; justify-content: center; padding: 0;"
+                        onmouseover="this.style.color='#ff4444'; this.style.borderColor='#ff4444'"
+                        onmouseout="this.style.color='#666'; this.style.borderColor='#333'"
+                    >
+                        <span style="line-height: 1; margin-top: -1px;">✕</span>
+                    </button>
+                <% } %>
+
+                <span style="color: var(--accent); font-size: 18px; margin-left: 10px; font-weight: bold;" x-text="currentAvg"></span>
+            </div>
+
+            <div style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">
+                ПРОСМОТРЫ: <span style="color: var(--accent)"><%= viewsCount %></span>
+            </div>
+
+            <p style="color: var(--text-main); line-height: 1.6; margin-bottom: auto; padding-right: 20px;">
+                <%= item.description %>
+            </p>
+
+            <div style="display: flex; gap: 15px; margin-top: 30px; align-items: flex-start; flex-wrap: wrap;">
+                <% if (chapters.length > 0) { %>
+                    <a href="/works/<%= item.id %>/chapters/<%= chapters[0].id %>" class="btn" style="padding: 12px 40px; text-decoration: none;">ЧИТАТЬ</a>
+                <% } else { %>
+                    <button class="btn" disabled style="padding: 12px 40px; opacity: 0.5;">ГЛАВ НЕТ</button>
+                <% } %>
+                
+                <div style="position: relative;" x-data="{ 
+                    shelfOpen: false,
+                    selectedShelf: '<%= currentShelfLabel %>',
+                    handleShelfClick() {
+                        if (!<%= !!user %>) {
+                            window.location.href = '/auth/login';
+                            return;
+                        }
+                        this.shelfOpen = !this.shelfOpen;
+                    },
+                    async addToShelf(shelfId, label) {
+                        try {
+                            const res = await fetch(`/shelves/add`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ shelfId: shelfId, workId: <%= item.id %> })
+                            });
+                            if (res.ok) {
+                                const labels = { 'reading': 'ЧИТАЮ', 'completed': 'ПРОЧИТАНО', 'bookmarks': 'В ЗАКЛАДКАХ' };
+                                this.selectedShelf = labels[label];
+                                this.shelfOpen = false;
+                            } else {
+                                alert('Ошибка при сохранении');
+                            }
+                        } catch (e) {
+                            console.error(e);
+                        }
+                    },
+                    async removeFromShelf() {
+                        try {
+                            const res = await fetch(`/shelves/remove`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ workId: <%= item.id %> })
+                            });
+                            if (res.ok) {
+                                this.selectedShelf = 'В КОЛЛЕКЦИЮ';
+                                this.shelfOpen = false;
+                            }
+                        } catch (e) { console.error(e); }
+                    }
+                }">
+                    <button class="btn" @click="handleShelfClick()" style="padding: 12px 40px; text-decoration: none; min-width: 150px;">
+                        <span x-text="selectedShelf"></span>
+                    </button>
+                    
+                    <% if (user) { %>
+                        <div x-show="shelfOpen" @click.away="shelfOpen = false" x-cloak
+                            style="position: absolute; bottom: 100%; left: 0; width: 100%; background: #000; border: var(--border-hard); z-index: 100; margin-bottom: 10px;">
+                            <% if (userShelves && userShelves.length > 0) { %>
+                                <% userShelves.forEach(shelf => { %>
+                                    <div @click="addToShelf(<%= shelf.id %>, '<%= shelf.shelfType %>')" class="dropdown-item">
+                                        <% 
+                                        const labels = { 'reading': 'ЧИТАЮ', 'completed': 'ПРОЧИТАНО', 'bookmarks': 'В ЗАКЛАДКИ' };
+                                        %>
+                                        <%= labels[shelf.shelfType] || shelf.shelfType %>
+                                    </div>
+                                <% }) %>
+                            <% } %>
+
+                            <div @click="removeFromShelf()" 
+                                class="dropdown-item" 
+                                style="color: #ff4444; border-top: 1px solid #222; font-weight: bold; margin-top: 5px;">
+                                УДАЛИТЬ ИЗ СПИСКА
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+
+                <% if (isAuthor) { %>
+                    <a href="/works/<%= item.id %>/edit" class="btn" style="padding: 12px 20px; text-decoration: none; background: #111; border-color: #333;">РЕДАКТИРОВАТЬ</a>
+                    <a href="/works/<%= item.id %>/chapters/new" class="btn" style="padding: 12px 20px; text-decoration: none; background: #111; border-color: var(--accent); color: var(--accent);">ДОБАВИТЬ ГЛАВУ</a>
+                <% } %>
+            </div>
+        </div>
+    </section>
+
+    <nav style="display: flex; border-bottom: var(--border-hard); margin-top: 20px; gap: 10px;">
+        <button @click="switchTab('comments')" 
+                :class="tab === 'comments' ? 'tab-active' : ''" 
+                class="tab-btn">КОММЕНТАРИИ (<%= commentsTotal %>)</button>
+        <button @click="switchTab('chapters')" 
+                :class="tab === 'chapters' ? 'tab-active' : ''" 
+                class="tab-btn">ГЛАВЫ (<%= chapters.length %>)</button>
+    </nav>
+
+    <div style="padding: 40px 0; position: relative;">
+        <div x-show="loading" class="skeleton-loader">
+            <div class="skeleton-line" style="width: 30%; height: 24px; margin-bottom: 20px;"></div>
+            <div class="skeleton-line" style="width: 100%; height: 150px;"></div>
+        </div>
+
+        <div x-show="!loading">
+            <div x-show="tab === 'comments'" x-cloak>
+                <%- include('../../partials/comments/comment.ejs', { 
+                    comments: comments, 
+                    item: item, 
+                    user: user 
+                }) %>
+
+                <% if (totalPages > 1) { %>
+                    <div class="pagination-wrap">
+                        <% if (currentPage > 1) { %>
+                            <a href="?tab=comments&page=<%= currentPage - 1 %>" class="pag-link">← НАЗАД</a>
+                        <% } %>
+                        
+                        <div class="pag-info">СЕГМЕНТ <%= currentPage %> / <%= totalPages %></div>
+                        
+                        <% if (currentPage < totalPages) { %>
+                            <a href="?tab=comments&page=<%= currentPage + 1 %>" class="pag-link">ВПЕРЕД →</a>
+                        <% } %>
+                    </div>
+                <% } %>
+            </div>
+
+            <div x-show="tab === 'chapters'" x-cloak>
+                <div style="border: var(--border-hard); background: #050505;">
+                    <% if (chapters.length > 0) { %>
+                        <% chapters.forEach((ch, i) => { %>
+                            <div class="chapter-row">
+                                <span style="font-weight: bold;"><%= i + 1 %>. <%= ch.title %></span>
+                                <div style="display: flex; gap: 20px; align-items: center;">
+                                    <% if (isAuthor) { %>
+                                        <a href="/works/<%= item.id %>/chapters/<%= ch.id %>/edit" style="color: var(--text-muted); font-size: 12px; text-decoration: none;" onmouseover="this.style.color='var(--text-main)'" onmouseout="this.style.color='var(--text-muted)'">РЕДАКТИРОВАТЬ</a>
+                                    <% } %>
+                                    <a href="/works/<%= item.id %>/chapters/<%= ch.id %>" style="color: var(--accent); font-size: 12px; text-decoration: none; font-weight: bold;">ЧИТАТЬ →</a>
+                                </div>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <div style="padding: 20px; color: var(--text-muted); text-align: center;">СПИСОК ГЛАВ ПУСТ</div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+[x-cloak] { display: none !important; }
+.author-link { color: var(--accent); text-decoration: none; font-size: 18px; display: inline-block; position: relative; transition: 0.3s; }
+.author-link::after { content: ''; position: absolute; width: 100%; transform: scaleX(0); height: 2px; bottom: -2px; left: 0; background-color: var(--accent); transform-origin: bottom right; transition: transform 0.25s ease-out; }
+.author-link:hover::after { transform: scaleX(1); transform-origin: bottom left; }
+.tab-btn { background: none; border: none; color: var(--text-muted); padding: 15px 30px; cursor: pointer; font-family: inherit; font-weight: bold; letter-spacing: 2px; transition: 0.2s; border-bottom: 3px solid transparent; }
+.tab-btn:hover { color: #fff; }
+.tab-btn.tab-active { color: var(--accent); border-bottom: 3px solid var(--accent); }
+.dropdown-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #111; font-size: 13px; transition: 0.2s; }
+.dropdown-item:hover { background: var(--accent); color: #fff; }
+.chapter-row { 
+    display: flex; 
+    justify-content: space-between; 
+    padding: 20px; 
+    border-bottom: 1px solid #111; 
+    color: #7c7979; 
+    transition: 0.2s; 
+    cursor: default;
+}
+.chapter-row:hover { background: #111; padding-left: 25px; }
+
+.rating-box {
+    background: none;
+    border: 1px solid #333;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: 0.2s;
+    padding: 0;
+}
+
+/* Стили скелетона */
+.skeleton-loader { width: 100%; }
+.skeleton-line { 
+    background: linear-gradient(90deg, #0a0a0a 25%, #151515 50%, #0a0a0a 75%);
+    background-size: 200% 100%;
+    animation: skeleton-pulse 1.5s infinite linear;
+    border-radius: 2px;
+}
+
+.pagination-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #111;
+}
+
+.pag-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 10px;
+    letter-spacing: 2px;
+    border: 1px solid #222;
+    padding: 8px 15px;
+    transition: 0.3s;
+}
+
+.pag-link:hover {
+    background: var(--accent);
+    color: #000;
+}
+
+.pag-info {
+    font-size: 10px;
+    color: #444;
+    letter-spacing: 1px;
+}
+
+@keyframes skeleton-pulse {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+</style>

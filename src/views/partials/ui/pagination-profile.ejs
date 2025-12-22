@@ -1,0 +1,57 @@
+<div class="pagination-container">
+    <div class="pagination">
+        <% if (current > 1) { %>
+            <a href="?tab=<%= tab %>&page=<%= current - 1 %>" class="page-link">←</a>
+        <% } %>
+
+        <% for(let i = 1; i <= total; i++) { %>
+            <a href="?tab=<%= tab %>&page=<%= i %>" 
+               class="page-link <%= (current === i) ? 'active' : '' %>">
+                <%= i %>
+            </a>
+        <% } %>
+
+        <% if (current < total) { %>
+            <a href="?tab=<%= tab %>&page=<%= current + 1 %>" class="page-link">→</a>
+        <% } %>
+    </div>
+</div>
+
+<style>
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin: 50px 0;
+}
+
+.pagination {
+    display: flex;
+    gap: 8px;
+}
+
+.page-link {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #2a2a33;
+    background: transparent;
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+
+.page-link:hover:not(.active) {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.page-link.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #000;
+}
+</style>

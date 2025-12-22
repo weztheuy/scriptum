@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>w\Scriptum</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/htmx.org@2.x.x/dist/htmx.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+<div class="page">
+    <header class="site-header">
+        <div class="container header-inner">
+            <nav class="nav-left">
+                <a class="nav-link accent" href="/">ГЛАВНАЯ</a>
+                <a class="nav-link accent" href="/works">БИБЛИОТЕКА</a>
+                <a class="nav-link accent" href="/authors">АВТОРЫ</a>
+            </nav>
+            <div class="header-user">
+                <% if (typeof user !== 'undefined' && user) { %>
+                    <div x-data="{ open: false }" class="user-menu-container">
+                        <a href="#" @click.prevent="open = !open" @click.away="open = false" class="nav-link accent">
+                            <%= user.publicName %> ▼
+                        </a>
+                        <div x-show="open" x-transition class="user-dropdown">
+                            <a href="/authors/<%= user.id %>">МОЙ ПРОФИЛЬ</a>
+                            <a href="/settings/account">НАСТРОЙКИ</a>
+                            <a href="/auth/logout" style="color: var(--accent); text-decoration: none;">ВЫЙТИ</a>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <a href="/auth/login">ВХОД</a>
+                    <a href="/auth/register">РЕГИСТРАЦИЯ</a>
+                <% } %>
+            </div>
+        </div>
+    </header>
+
+    <main class="container main-content">
+        <%- body %> </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div class="copyright">© 2025 w\Scriptum</div>
+        </div>
+    </footer>
+</div>
+</body>
+</html>

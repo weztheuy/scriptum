@@ -1,0 +1,98 @@
+<div class="auth-page" x-data="{ 
+    step: 'details', 
+    form: { login: '', email: '', password: '', passwordConfirm: '' },
+    code: '',
+    error: '',
+    validate() {
+        const pass = this.form.password;
+        // Регулярное выражение: разрешаем латиницу, цифры и спецсимволы @$!%*?&. 
+        // Запрещаем пробелы, кавычки и скобки.
+        const forbiddenChars = /[^A-Za-z0-9@$!%*?&]/;
+
+        if (pass.length < 8) {
+            this.error = 'ПАРОЛЬ ДОЛЖЕН БЫТЬ НЕ МЕНЕЕ 8 СИМВОЛОВ';
+            return false;
+        }
+        if (forbiddenChars.test(pass)) {
+            this.error = 'ПАРОЛЬ СОДЕРЖИТ ЗАПРЕЩЕННЫЕ СИМВОЛЫ (РАЗРЕШЕНЫ ЛАТИНИЦА, ЦИФРЫ И @$!%*?&)';
+            return false;
+        }
+        if (pass !== this.form.passwordConfirm) {
+            this.error = 'ПАРОЛИ НЕ СОВПАДАЮТ';
+            return false;
+        }
+        this.error = '';
+        return true;
+    }
+}">
+    <div class="auth-container" style="max-width: 400px; margin: 100px auto; border: var(--border-hard); padding: 40px; background: #050505;">
+        
+        <h1 class="title" style="font-size: 24px; margin-bottom: 30px; text-align: center;" 
+            x-text="step === 'details' ? 'РЕГИСТРАЦИЯ' : 'ПОДТВЕРЖДЕНИЕ'"></h1>
+
+        <div x-show="error" x-cloak 
+             style="color: var(--accent); font-size: 11px; margin-bottom: 20px; text-align: center; border: 1px solid var(--accent); padding: 10px; letter-spacing: 1px;" 
+             x-text="error"></div>
+
+        <form x-show="step === 'details'" @submit.prevent="
+            if(!validate()) return;
+            const res = await fetch('/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(form)
+            });
+            if(res.ok) { step = 'code'; error = ''; } else { error = 'ОШИБКА РЕГИСТРАЦИИ ИЛИ EMAIL ЗАНЯТ'; }
+        ">
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 11px; color: var(--text-muted);">ЛОГИН</label>
+                <input type="text" x-model="form.login" required class="auth-input">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 11px; color: var(--text-muted);">EMAIL</label>
+                <input type="email" x-model="form.email" required class="auth-input">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 11px; color: var(--text-muted);">ПАРОЛЬ</label>
+                <input type="password" x-model="form.password" required class="auth-input">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 30px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 11px; color: var(--text-muted);">ПОДТВЕРДИТЕ ПАРОЛЬ</label>
+                <input type="password" x-model="form.passwordConfirm" required class="auth-input">
+            </div>
+
+            <button type="submit" class="btn" style="width: 100%;">ПРОДОЛЖИТЬ</button>
+        </form>
+
+        <form x-show="step === 'code'" x-cloak @submit.prevent="
+            const res = await fetch('/auth/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code })
+            });
+            if(res.ok) window.location.href = '/'; else error = 'НЕВЕРНЫЙ КОД';
+        ">
+            <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-bottom: 25px; line-height: 1.5;">
+                МЫ ОТПРАВИЛИ КОД НА <br>
+                <span style="color: #fff; font-weight: bold;" x-text="form.email"></span>
+            </p>
+            <div class="form-group" style="margin-bottom: 30px;">
+                <input type="text" x-model="code" maxlength="5" placeholder="*****" required 
+                       style="width: 100%; background: #000; border: 2px solid var(--accent); color: var(--accent); padding: 15px; font-family: monospace; font-size: 32px; text-align: center; letter-spacing: 12px; outline: none;">
+            </div>
+            <button type="submit" class="btn" style="width: 100%;">ПОДТВЕРДИТЬ</button>
+            <button type="button" @click="step = 'details'; error = ''" style="background: none; border: none; color: var(--text-muted); width: 100%; margin-top: 20px; font-size: 10px; cursor: pointer; text-decoration: underline;">ВЕРНУТЬСЯ К РЕДАКТИРОВАНИЮ</button>
+        </form>
+
+    </div>
+</div>
+
+<style>
+.auth-input {
+    width: 100%; background: #000; border: 1px solid #222; color: #fff; padding: 12px; font-family: inherit; transition: 0.2s;
+}
+.auth-input:focus { border-color: var(--accent); outline: none; background: #080808; }
+[x-cloak] { display: none !important; }
+</style>

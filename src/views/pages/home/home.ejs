@@ -1,0 +1,30 @@
+<section class="hero">
+    <h1 class="title">W-SCRIPTUM — ПЛАТФОРМА ДЛЯ ПУБЛИКАЦИИ И ЧТЕНИЯ</h1>
+    <p class="subtitle">Открывайте новые истории, поддерживайте авторов, сохраняйте любимые произведения.</p>
+</section>
+
+<section class="section">
+    <div class="section-header">
+        <h2 class="section-title">ПОПУЛЯРНОЕ</h2>
+        <a class="btn" href="/works?sort=popular">СМОТРЕТЬ ВСЕ</a>
+    </div>
+
+    <div class="works-grid">
+        <% popularWorks.forEach(work => { %>
+            <%- include('../../partials/cards/work-card', { work: work }) %>
+        <% }) %>
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-header">
+        <h2 class="section-title">НОВЫЕ ПРОИЗВЕДЕНИЯ</h2>
+        <a class="btn" href="/works">СМОТРЕТЬ ВСЕ</a>
+    </div>
+
+    <div class="works-grid">
+        <% newWorks.forEach(work => { %>
+            <%- include('../../partials/cards/work-card', { work: work }) %>
+        <% }) %>
+    </div>
+</section>

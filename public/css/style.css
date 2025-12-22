@@ -1,0 +1,400 @@
+/* =====================
+   ПЕРЕМЕННЫЕ
+===================== */
+:root {
+    --bg-main: #0b0b0d;
+    --bg-secondary: #0b0b0d;
+    --bg-card: #0b0b0d;
+    --text-main: #e6e6eb;
+    --text-muted: #9a9aa3;
+    --accent: #c6274d;
+    --border-hard: 2px solid #333;
+}
+
+/* =====================
+   СБРОС
+===================== */
+*, *::before, *::after {
+    box-sizing: border-box;
+    font-weight: 400;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg-main);
+    color: var(--text-main);
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* =====================
+   ИНТЕРАКТ. ЭЛЕМЕНТЫ
+===================== */
+input, select, textarea, button {
+    font-family: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    color: var(--text-main);
+    background: var(--bg-card);
+    border: 1px solid #2a2a33;
+    padding: 6px 10px;
+    border-radius: 0;
+}
+
+/* =====================
+   ВЫПАДАЮЩЕЕ МЕНЮ
+===================== */
+.user-menu-container { position: relative; display: inline-block; }
+.user-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: var(--bg-secondary);
+    border: var(--border-hard);
+    min-width: 180px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    padding: 4px 0;
+    margin-top: 12px;
+}
+.user-dropdown a, .dropdown-logout-btn {
+    padding: 10px 16px;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    color: var(--text-main);
+    text-decoration: none;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+}
+.user-dropdown a:hover, .dropdown-logout-btn:hover{
+    background: var(--accent);
+    color: #000;
+}
+
+/* =====================
+   КОНТЕЙНЕР
+===================== */
+.container {
+    max-width: 1205px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* =====================
+   ХЭДЕР
+===================== */
+.site-header {
+    background: var(--bg-secondary);
+    border-bottom: var(--border-hard);
+}
+
+.header-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 64px;
+}
+
+.nav-left {
+    display: flex;
+    gap: 32px;
+}
+
+.nav-link {
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    padding: 6px 0;
+    line-height: 1.6;
+}
+
+.nav-link.accent {
+    color: var(--accent);
+}
+
+.nav-link.accent:hover {
+    text-decoration: underline;
+}
+
+.header-user {
+    display: flex;
+    gap: 16px;
+}
+
+.header-user a {
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    padding: 6px 12px;
+    background: none;
+    color: var(--accent);
+    border: none;
+    cursor: pointer;
+    line-height: 1.6;
+}
+
+.header-user a:hover {
+    text-decoration: underline;
+}
+
+/* =====================
+   HERO
+===================== */
+.hero {
+    padding: 80px 0 64px;
+    border-bottom: var(--border-hard);
+}
+
+.title {
+    font-size: 42px;
+    line-height: 1.6;
+    margin: 0 0 24px;
+    max-width: 900px;
+    font-weight: 400;
+}
+
+.subtitle {
+    font-size: 16px;
+    color: var(--text-muted);
+    max-width: 640px;
+    font-weight: 400;
+    line-height: 1.6;
+}
+
+/* =====================
+   СЕКЦИИ
+===================== */
+.section {
+    padding: 64px 0;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.section-title {
+    font-size: 22px;
+    letter-spacing: 0.12em;
+    font-weight: 400;
+    line-height: 1.6;
+}
+
+/* =====================
+   КНОПКИ
+===================== */
+.btn {
+    padding: 10px 18px;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    border: 2px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    cursor: pointer;
+    line-height: 1.6;
+}
+
+.btn:hover {
+    background: var(--accent);
+    color: #000;
+}
+
+/* =====================
+   СЕТКА РАБОТ
+===================== */
+.works-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+/* =====================
+   КАРТОЧКИ
+===================== */
+.card {
+    position: relative; /* Чтобы позиционировать тело внутри */
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-card);
+    border: 1px solid #2a2a33;
+    height: 400px; /* Фиксированная высота для всех карточек в сетке */
+    transition: transform 0.2s, box-shadow 0.2s;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.8);
+    border-color: var(--accent);
+}
+
+.cover {
+    position: absolute; /* Обложка на весь фон */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    background-color: #000;
+}
+
+/* Если скрипт вставляет <img> внутрь .cover */
+.cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    opacity: 0.6; /* Затемняем обложку, чтобы текст читался лучше */
+    transition: 0.3s;
+}
+
+.card:hover .cover img {
+    opacity: 0.8;
+    transform: scale(1.03);
+}
+
+.card-body {
+    position: absolute; /* Текст поверх обложки */
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 2;
+    padding: 16px;
+    background: linear-gradient(to top, rgba(11, 11, 13, 1) 0%, rgba(11, 11, 13, 0.8) 70%, rgba(11, 11, 13, 0) 100%);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.work-title {
+    font-size: 16px;
+    margin: 0;
+    font-weight: 400;
+    color: var(--accent);
+    line-height: 1.6;
+    cursor: pointer;
+}
+
+.work-title:hover {
+    text-decoration: underline;
+}
+
+.work-author {
+    font-size: 14px;
+    color: var(--accent);
+    line-height: 1.6;
+    cursor: pointer;
+}
+
+.work-author:hover {
+    text-decoration: underline;
+}
+
+.work-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-top: 5px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Ограничение описания 3 строками */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* =====================
+   ЗАГЛУШКИ
+===================== */
+.line {
+    height: 10px;
+    background: var(--bg-card);
+}
+
+.line.title {
+    width: 80%;
+    height: 14px;
+}
+
+.line.author {
+    width: 50%;
+}
+
+.line.desc {
+    width: 100%;
+}
+
+/* =====================
+   FOOTER
+===================== */
+.site-footer {
+    border-top: var(--border-hard);
+    background: var(--bg-secondary);
+}
+
+.footer-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 56px;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 400;
+    line-height: 1.6;
+}
+
+/* =====================
+   АДАПТИВ
+===================== */
+@media (max-width: 1200px) {
+    .works-grid {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 16px;
+        padding-bottom: 8px;
+    }
+
+    .works-grid .card {
+        flex: 0 0 280px;
+        min-width: 0;
+        max-width: 280px;
+        box-sizing: border-box;
+        word-break: break-word;
+        overflow: hidden;
+    }
+
+    .works-grid .card-body {
+        min-width: 0;
+    }
+}
+
+@media (max-width: 628px) {
+    .header-inner {
+        flex-direction: column; /* столбец вместо строки */
+        align-items: flex-start; /* элементы выравниваются по левому краю */
+        gap: 8px; /* небольшой промежуток между строками */
+    }
+
+    .nav-left {
+        order: 1; /* первая строка */
+        width: 100%; /* растянуть на всю ширину */
+        justify-content: flex-start;
+    }
+
+    .header-user {
+        order: 2; /* вторая строка */
+        width: 100%;
+        justify-content: flex-start;
+    }
+}

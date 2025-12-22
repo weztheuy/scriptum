@@ -1,7 +1,10 @@
 node_modules/
 npm-debug.log
+package-lock.json
+
 *.db
 *.sqlite
-storage/
+
+uploads/
+
 .env
-.DS_Store

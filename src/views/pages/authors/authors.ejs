@@ -1,0 +1,209 @@
+<div class="authors-page" x-data="{ search: '<%= search %>' }">
+    <section class="section">
+        <div class="section-header" style="border-bottom: var(--border-hard); padding-bottom: 20px; margin-bottom: 40px;">
+            <h2 class="section-title" style="font-size: 32px; letter-spacing: 4px;">АВТОРЫ</h2>
+        </div>
+
+        <form action="/authors" method="GET" class="search-container">
+            <input type="hidden" name="page" value="1">
+            <div class="filter-group" style="flex: 1;">
+                <label>ПОИСК ПО ИМЕНИ ИЛИ ЛОГИНУ</label>
+                <input type="text" name="search" x-model="search" placeholder="ВВЕДИТЕ ИМЯ АВТОРА...">
+            </div>
+
+            <div class="filter-actions">
+                <button type="submit" class="btn btn-apply">ПОИСК</button>
+                <a href="/authors" class="btn btn-reset" title="Очистить">✕</a>
+            </div>
+        </form>
+
+        <div class="authors-grid">
+            <% if (authors && authors.length > 0) { %>
+                <% authors.forEach(author => { %>
+                    <%- include('../../partials/cards/author-card', { author: author }) %>
+                <% }) %>
+            <% } else { %>
+                <div class="empty-results">
+                    АВТОР С ТАКИМ ИМЕНЕМ НЕ НАЙДЕН
+                </div>
+            <% } %>
+        </div>
+
+        <% if (pagination.total > 1) { %>
+            <div class="pagination">
+                <% 
+                    const getPageUrl = (p) => {
+                        const params = new URLSearchParams();
+                        if (search) params.set('search', search);
+                        params.set('page', p);
+                        return '/authors?' + params.toString();
+                    }
+                %>
+
+                <% if (pagination.current > 1) { %>
+                    <a href="<%= getPageUrl(pagination.current - 1) %>">←</a>
+                <% } %>
+
+                <% for(let i = 1; i <= pagination.total; i++) { %>
+                    <a href="<%= getPageUrl(i) %>" class="<%= pagination.current === i ? 'active' : '' %>">
+                        <%= i %>
+                    </a>
+                <% } %>
+
+                <% if (pagination.current < pagination.total) { %>
+                    <a href="<%= getPageUrl(pagination.current + 1) %>">→</a>
+                <% } %>
+            </div>
+        <% } %>
+    </section>
+</div>
+
+<style>
+.search-container {
+    display: flex;
+    gap: 15px;
+    align-items: flex-end;
+    margin-bottom: 50px;
+    max-width: 800px;
+}
+
+.authors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.author-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    background: #0b0b0d;
+    border: 1px solid #2a2a33;
+    transition: 0.3s;
+}
+
+.author-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+.author-avatar {
+    width: 60px;
+    height: 60px;
+    background: #1a1a20;
+    border: 2px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--accent);
+}
+
+.author-name {
+    font-size: 16px;
+    margin: 0;
+    letter-spacing: 1px;
+}
+
+.author-login {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 4px 0;
+}
+
+.author-stats {
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 1px;
+}
+
+.filter-group label {
+    display: block;
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.filter-group input {
+    width: 100%;
+    background: #050505;
+    border: 1px solid #2a2a33;
+    padding: 12px;
+    color: #fff;
+    font-size: 12px;
+    height: 45px;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.btn-apply {
+    height: 45px;
+    padding: 0 30px;
+}
+
+.btn-reset {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+    background: transparent;
+    border: 1px solid #2a2a33;
+    color: var(--text-muted);
+    font-size: 18px;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.btn-reset:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.empty-results {
+    grid-column: 1/-1;
+    text-align: center;
+    padding: 60px;
+    border: 1px dashed #333;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+}
+
+.pagination {
+    margin-top: 60px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.pagination a {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #2a2a33;
+    text-decoration: none;
+    color: #fff;
+    transition: 0.2s;
+}
+
+.pagination a.active {
+    background: var(--accent);
+    color: #000;
+    border-color: var(--accent);
+    font-weight: bold;
+}
+
+.pagination a:hover:not(.active) {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+</style>

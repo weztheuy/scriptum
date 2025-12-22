@@ -1,0 +1,130 @@
+<div class="settings-container" x-data="{ showDeleteModal: false }">
+    <h1 class="page-title">УПРАВЛЕНИЕ АККАУНТОМ</h1>
+
+    <div class="settings-layout">
+        <aside class="settings-sidebar">
+            <div class="avatar-upload-section" style="visibility: hidden; height: 260px;"></div>
+
+            <nav class="settings-nav">
+                <a href="/settings/profile" class="nav-item">ПРОФИЛЬ</a>
+                <a href="/settings/privacy" class="nav-item">ПРИВАТНОСТЬ</a>
+                <a href="/settings/account" class="nav-item active">АККАУНТ</a>
+            </nav>
+        </aside>
+
+        <main class="settings-main">
+            <% if (locals.error) { %>
+                <div class="alert-box">
+                    ВНИМАНИЕ: <%= error.toUpperCase() %>
+                </div>
+            <% } %>
+
+            <form action="/settings/username" method="POST" enctype="multipart/form-data" class="modern-form">
+                <h2 class="section-subtitle">СМЕНА ЛОГИНА</h2>
+                <div class="form-group">
+                    <label>ТЕКУЩИЙ ЛОГИН (ID)</label>
+                    <input type="text" value="<%= user.login %>" disabled style="opacity: 0.5; cursor: not-allowed;">
+                </div>
+                <div class="form-group">
+                    <label>НОВЫЙ ЛОГИН</label>
+                    <input type="text" name="login" placeholder="Введите новый логин" required maxlength="30">
+                </div>
+                <div class="form-group">
+                    <label>ПАРОЛЬ ДЛЯ ПОДТВЕРЖДЕНИЯ</label>
+                    <input type="password" name="password" required>
+                </div>
+                <button type="submit" class="btn">ОБНОВИТЬ ЛОГИН</button>
+            </form>
+
+            <div class="spacer"></div>
+
+            <form action="/settings/account" method="POST" enctype="multipart/form-data" class="modern-form">
+                <h2 class="section-subtitle">СМЕНА EMAIL</h2>
+                <div class="form-group">
+                    <label>ТЕКУЩАЯ ПОЧТА</label>
+                    <input type="email" value="<%= user.email %>" disabled style="opacity: 0.5; cursor: not-allowed;">
+                </div>
+                <div class="form-group">
+                    <label>НОВАЯ ЭЛЕКТРОННАЯ ПОЧТА</label>
+                    <input type="email" name="email" placeholder="new-email@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label>ТЕКУЩИЙ ПАРОЛЬ</label>
+                    <input type="password" name="currentPassword" required>
+                </div>
+                <button type="submit" class="btn">ОБНОВИТЬ EMAIL</button>
+            </form>
+
+            <div class="spacer"></div>
+
+            <form action="/settings/password" method="POST" enctype="multipart/form-data" class="modern-form">
+                <h2 class="section-subtitle">БЕЗОПАСНОСТЬ</h2>
+                <div class="form-group">
+                    <label>СТАРЫЙ ПАРОЛЬ</label>
+                    <input type="password" name="oldPassword" required>
+                </div>
+                <div class="form-group">
+                    <label>НОВЫЙ ПАРОЛЬ</label>
+                    <input type="password" name="newPassword" required>
+                </div>
+                <button type="submit" class="btn">ИЗМЕНИТЬ ПАРОЛЬ</button>
+            </form>
+
+            <div class="danger-divider"></div>
+
+            <div class="modern-form">
+                <h2 class="section-subtitle" style="color: #ff4444">ОПАСНАЯ ЗОНА</h2>
+                <p class="danger-text">Удаление аккаунта приведет к безвозвратной потере всех ваших данных, произведений и настроек.</p>
+                <button type="button" @click="showDeleteModal = true" class="btn btn-danger">УДАЛИТЬ АККАУНТ</button>
+            </div>
+        </main>
+    </div>
+
+    <template x-if="showDeleteModal">
+        <div class="modal-overlay" @click.self="showDeleteModal = false">
+            <div class="modal-content" @click.stop>
+                <h3>ПОДТВЕРДИТЕ УДАЛЕНИЕ</h3>
+                <p>Для удаления аккаунта введите ваш пароль. Это действие невозможно отменить.</p>
+                <form action="/settings/delete-account" method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <input type="password" name="password" placeholder="Ваш пароль" required 
+                               style="width: 100%; background: #050505; border: 1px solid #1a1a1a; padding: 15px; color: #fff;">
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" @click="showDeleteModal = false" class="btn-secondary">ОТМЕНА</button>
+                        <button type="submit" class="btn-danger-filled">УДАЛИТЬ НАВСЕГДА</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </template>
+</div>
+
+<style>
+/* Стили без изменений, добавлены только фиксы для модалки */
+.settings-container { max-width: 1000px; min-height: 752px; margin: 40px auto; padding: 0 24px; }
+.page-title { font-size: 28px; letter-spacing: 4px; margin-bottom: 40px; color: var(--text-main); }
+.settings-layout { display: grid; grid-template-columns: 250px 1fr; gap: 60px; }
+.settings-nav { display: flex; flex-direction: column; border-left: 1px solid #1a1a1a; }
+.nav-item { padding: 12px 20px; font-size: 11px; letter-spacing: 2px; color: var(--text-muted); transition: 0.3s; border-left: 2px solid transparent; margin-left: -1px; text-decoration: none; }
+.nav-item:hover { color: var(--accent); }
+.nav-item.active { color: var(--accent); border-left-color: var(--accent); background: linear-gradient(to right, rgba(198,27,77,0.05), transparent); }
+.section-subtitle { font-size: 14px; letter-spacing: 2px; margin-bottom: 25px; color: var(--accent); }
+.modern-form .form-group { margin-bottom: 30px; }
+.modern-form label { display: block; font-size: 10px; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 10px; }
+.modern-form input { width: 100%; background: #050505; border: 1px solid #1a1a1a; padding: 15px; color: #fff; font-family: inherit; transition: 0.3s; }
+.modern-form input:focus { border-color: var(--accent); outline: none; }
+.alert-box { border: 1px solid var(--accent); padding: 15px; color: var(--accent); font-size: 12px; margin-bottom: 30px; letter-spacing: 1px; }
+.spacer { height: 60px; }
+.danger-divider { height: 60px; border-bottom: 1px solid #1a1a1a; margin-bottom: 60px; }
+.danger-text { font-size: 11px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6; }
+.btn-danger { background: transparent; border: 1px solid #ff4444; color: #ff4444; cursor: pointer; padding: 12px 24px; font-size: 11px; letter-spacing: 2px; transition: 0.3s; }
+.btn-danger:hover { background: #ff4444; color: #000; }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+.modal-content { background: #0a0a0a; border: 1px solid #1a1a1a; padding: 40px; max-width: 450px; width: 100%; text-align: center; }
+.modal-content h3 { color: #ff4444; letter-spacing: 3px; margin-bottom: 20px; font-size: 18px; }
+.modal-content p { color: var(--text-muted); font-size: 12px; margin-bottom: 30px; line-height: 1.6; }
+.modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+.btn-secondary { background: transparent; border: 1px solid #333; color: #fff; padding: 12px; cursor: pointer; font-size: 10px; letter-spacing: 1px; }
+.btn-danger-filled { background: #ff4444; border: 1px solid #ff4444; color: #000; padding: 12px; cursor: pointer; font-size: 10px; letter-spacing: 1px; font-weight: bold; }
+</style>

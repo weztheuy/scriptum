@@ -1,0 +1,62 @@
+<div class="auth-page" x-data="{ 
+    form: { identity: '', password: '' },
+    error: '',
+    validate() {
+        const pass = this.form.password;
+        const forbiddenChars = /[^A-Za-z0-9@$!%*?&]/;
+
+        if (pass.length < 8) {
+            this.error = 'ПАРОЛЬ ДОЛЖЕН БЫТЬ НЕ МЕНЕЕ 8 СИМВОЛОВ';
+            return false;
+        }
+        if (forbiddenChars.test(pass)) {
+            this.error = 'ПАРОЛЬ СОДЕРЖИТ ЗАПРЕЩЕННЫЕ СИМВОЛЫ';
+            return false;
+        }
+        return true;
+    }
+}">
+    <div class="auth-container" style="max-width: 400px; margin: 100px auto; border: var(--border-hard); padding: 40px; background: #050505;">
+        
+        <h1 class="title" style="font-size: 24px; margin-bottom: 30px; text-align: center;">ВХОД</h1>
+
+        <div x-show="error" x-cloak 
+             style="color: var(--accent); font-size: 11px; margin-bottom: 20px; text-align: center; border: 1px solid var(--accent); padding: 10px;" 
+             x-text="error"></div>
+
+        <form @submit.prevent="
+            if(!validate()) return;
+            const res = await fetch('/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(form)
+            });
+            const data = await res.json();
+            if(res.ok) window.location.href = '/'; else error = data.error;
+        ">
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 11px; color: var(--text-muted);">ЛОГИН ИЛИ EMAIL</label>
+                <input type="text" x-model="form.identity" required class="auth-input">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 30px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 11px; color: var(--text-muted);">ПАРОЛЬ</label>
+                <input type="password" x-model="form.password" required class="auth-input">
+            </div>
+
+            <button type="submit" class="btn" style="width: 100%;">ВОЙТИ</button>
+            
+            <div style="margin-top: 25px; text-align: center;">
+                <a href="/auth/register" style="color: var(--text-muted); font-size: 11px; text-decoration: none;">НЕТ АККАУНТА? <span style="color: var(--accent)">РЕГИСТРАЦИЯ</span></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.auth-input {
+    width: 100%; background: #000; border: 1px solid #222; color: #fff; padding: 12px; font-family: inherit; transition: 0.2s;
+}
+.auth-input:focus { border-color: var(--accent); outline: none; }
+[x-cloak] { display: none !important; }
+</style>

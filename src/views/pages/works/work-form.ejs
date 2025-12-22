@@ -1,0 +1,230 @@
+<% 
+  const isEdit = typeof item !== 'undefined' && item.id;
+  const actionUrl = isEdit ? `/works/${item.id}/edit` : '/works/new';
+  const pageTitle = isEdit ? `РЕДАКТИРОВАНИЕ: ${item.title.toUpperCase()}` : 'НОВОЕ ПРОИЗВЕДЕНИЕ';
+  const safeTitle = isEdit ? item.title.replace(/'/g, "\\'") : '';
+%>
+
+<div class="work-form-container" x-data="{ 
+    showGenres: false, 
+    showTags: false,
+    title: '<%= safeTitle %>',
+    selectedGenres: [<%= (typeof currentGenreIds !== 'undefined' && currentGenreIds) ? currentGenreIds.join(',') : '' %>],
+    selectedTags: [<%= (typeof currentTagIds !== 'undefined' && currentTagIds) ? currentTagIds.join(',') : '' %>],
+    coverAction: 'keep',
+    preview: '<%= (isEdit && item.coverUrl) ? item.coverUrl : '' %>',
+    isPublic: <%= (isEdit && item.isPublic) ? item.isPublic : 'false' %>
+}">
+    <h1 class="page-title"><%= pageTitle %></h1>
+
+    <form action="<%= actionUrl %>" method="POST" enctype="multipart/form-data" class="modern-form">
+        <% if (isEdit) { %>
+            <input type="hidden" name="cover_action" :value="coverAction">
+        <% } %>
+        <input type="hidden" name="isPublic" :value="isPublic">
+
+        <div class="form-layout">
+            <div class="cover-upload-section">
+                <div class="cover-wrapper">
+                    <label class="cover-dropzone" :class="{ 'has-preview': preview && !preview.includes('default-cover') }">
+                        <template x-if="!preview || preview.includes('default-cover')">
+                            <div class="dropzone-content">
+                                <span class="icon">📷</span>
+                                <span><%= isEdit ? 'ИЗМЕНИТЬ ОБЛОЖКУ' : 'ЗАГРУЗИТЬ ОБЛОЖКУ' %></span>
+                                <small>Рекомендуем 2:3</small>
+                            </div>
+                        </template>
+                        <template x-if="preview && !preview.includes('default-cover')">
+                            <img :src="preview" class="cover-preview">
+                        </template>
+                        <input type="file" name="cover" accept="image/*" class="hidden-input" x-ref="fileInput"
+                               @change="const file = $event.target.files[0]; if (file) { preview = URL.createObjectURL(file); coverAction='update' }">
+                    </label>
+                    <button type="button" x-show="preview && !preview.includes('default-cover')" 
+                            @click="preview = '/assets/default-cover.png'; coverAction = 'delete'; $refs.fileInput.value = ''" 
+                            class="btn-clear-image">✕</button>
+                </div>
+            </div>
+
+            <div class="fields-section">
+                <div class="form-group">
+                    <label>НАЗВАНИЕ</label>
+                    <input type="text" name="title" required x-model="title"
+                           placeholder="Как называется ваша история?" maxlength="100">
+                </div>
+
+                <div class="form-group">
+                    <label>СТАТУС ВИДИМОСТИ</label>
+                    <div class="visibility-toggle" @click="isPublic = !isPublic" :class="isPublic ? 'is-active' : ''">
+                        <div class="toggle-track">
+                            <div class="toggle-dot"></div>
+                        </div>
+                        <span x-text="isPublic ? 'ОПУБЛИКОВАНО (ВИДЯТ ВСЕ)' : 'ЧЕРНОВИК (ВИДИТЕ ТОЛЬКО ВЫ)'"></span>
+                    </div>
+                </div>
+
+                <div class="form-group relative">
+                    <label>ЖАНРЫ</label>
+                    <div class="custom-select" @click="showGenres = !showGenres; showTags = false">
+                        <span x-text="selectedGenres.length > 0 ? 'ВЫБРАНО: ' + selectedGenres.length : 'ВЫБЕРИТЕ ЖАНРЫ'"></span>
+                        <div class="dropdown" x-show="showGenres" x-cloak @click.away="showGenres = false">
+                            <div class="dropdown-list">
+                                <% allGenres.forEach(genre => { %>
+                                    <label class="checkbox-item" @click.stop>
+                                        <input type="checkbox" name="genres" value="<%= genre.id %>" 
+                                               :checked="selectedGenres.includes(<%= genre.id %>)"
+                                               @change="if($el.checked) selectedGenres.push(<%= genre.id %>); else selectedGenres = selectedGenres.filter(id => id !== <%= genre.id %>)">
+                                        <span><%= genre.name.toUpperCase() %></span>
+                                    </label>
+                                <% }) %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group relative">
+                    <label>МЕТКИ</label>
+                    <div class="custom-select" @click="showTags = !showTags; showGenres = false">
+                        <span x-text="selectedTags.length > 0 ? 'ВЫБРАНО: ' + selectedTags.length : 'ВЫБЕРИТЕ МЕТКИ'"></span>
+                        <div class="dropdown" x-show="showTags" x-cloak @click.away="showTags = false">
+                            <div class="dropdown-list">
+                                <% allTags.forEach(tag => { %>
+                                    <label class="checkbox-item" @click.stop>
+                                        <input type="checkbox" name="tags" value="<%= tag.id %>"
+                                               :checked="selectedTags.includes(<%= tag.id %>)"
+                                               @change="if($el.checked) selectedTags.push(<%= tag.id %>); else selectedTags = selectedTags.filter(id => id !== <%= tag.id %>)">
+                                        <span><%= tag.name.toUpperCase() %></span>
+                                    </label>
+                                <% }) %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>АННОТАЦИЯ</label>
+                    <textarea name="description" rows="8" placeholder="Краткое описание для читателей..." 
+                              maxlength="2000"><%= isEdit ? item.description : '' %></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-footer">
+            <div style="display: flex; gap: 20px;">
+                <button type="submit" class="btn btn-accent" 
+                        :disabled="!title.trim() || selectedGenres.length === 0 || selectedTags.length === 0">
+                    <%= isEdit ? 'СОХРАНИТЬ ИЗМЕНЕНИЯ' : 'СОЗДАТЬ ПРОИЗВЕДЕНИЕ' %>
+                </button>
+                <a href="<%= isEdit ? `/works/${item.id}` : '/' %>" class="btn btn-secondary">ОТМЕНА</a>
+            </div>
+
+            <% if (isEdit) { %>
+                <button type="button" 
+                        onclick="if(confirm('УДАЛИТЬ ПРОИЗВЕДЕНИЕ БЕЗВОЗВРАТНО?')) window.location.href='/works/<%= item.id %>/delete'" 
+                        class="btn-delete-link">
+                    УДАЛИТЬ ПРОИЗВЕДЕНИЕ
+                </button>
+            <% } %>
+        </div>
+    </form>
+</div>
+
+<style>
+/* ... (предыдущие стили без изменений до секции кнопок) ... */
+.work-form-container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+.form-layout { display: grid; grid-template-columns: 250px 1fr; gap: 40px; margin-top: 30px; }
+.cover-wrapper { position: relative; width: 250px; }
+.cover-dropzone {
+    width: 250px; height: 375px; border: 2px dashed #333;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; overflow: hidden; background: #0a0a0a; transition: 0.3s;
+}
+.cover-dropzone.has-preview { border-style: solid; border-color: #1a1a1a; }
+.cover-dropzone:hover { border-color: var(--accent); }
+.hidden-input { display: none; }
+.cover-preview { width: 100%; height: 100%; object-fit: cover; }
+
+.btn-clear-image {
+    position: absolute; top: -10px; right: -10px; width: 30px; height: 30px;
+    border-radius: 50%; background: var(--accent); color: #000;
+    border: none; cursor: pointer; font-weight: bold; z-index: 5;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+.dropzone-content { text-align: center; color: #666; display: flex; flex-direction: column; gap: 10px; }
+.dropzone-content .icon { font-size: 32px; }
+
+.modern-form .form-group { margin-bottom: 25px; }
+.modern-form label { display: block; letter-spacing: 2px; font-size: 10px; margin-bottom: 8px; color: #888; }
+.modern-form input[type="text"], .modern-form textarea {
+    width: 100%; background: #050505; border: 1px solid #1a1a1a;
+    padding: 15px; color: #fff; font-family: inherit; font-size: 14px;
+}
+
+.relative { position: relative; }
+.custom-select {
+    width: 100%; background: #050505; border: 1px solid #1a1a1a;
+    padding: 12px 15px; color: #fff; font-size: 13px; cursor: pointer;
+    min-height: 45px; display: flex; align-items: center;
+}
+
+.dropdown {
+    position: absolute; top: 100%; left: 0; width: 100%;
+    background: #0b0b0d; border: 2px solid #222; z-index: 100;
+    margin-top: 5px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+}
+.dropdown-list { max-height: 200px; overflow-y: auto; padding: 10px; }
+
+.checkbox-item { display: flex; align-items: center; gap: 12px; padding: 8px; cursor: pointer; }
+.checkbox-item:hover { background: rgba(255,255,255,0.05); }
+.checkbox-item input { accent-color: var(--accent); }
+.checkbox-item span { font-size: 11px; letter-spacing: 1px; }
+
+.visibility-toggle {
+    display: flex; align-items: center; gap: 15px; background: #050505;
+    border: 1px solid #1a1a1a; padding: 12px 15px; cursor: pointer;
+    transition: 0.3s;
+}
+.visibility-toggle.is-active { border-color: var(--accent); color: #fff; }
+.visibility-toggle span { font-size: 11px; letter-spacing: 1px; color: #888; }
+.visibility-toggle.is-active span { color: #fff; }
+
+.toggle-track {
+    width: 34px; height: 18px; background: #222; position: relative; border-radius: 20px;
+}
+.toggle-dot {
+    width: 14px; height: 14px; background: #444; position: absolute;
+    top: 2px; left: 2px; transition: 0.3s; border-radius: 50%;
+}
+.is-active .toggle-dot { left: 18px; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+
+/* ЭФФЕКТ ПОТУХАНИЯ КНОПКИ */
+.btn-accent:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    filter: grayscale(1);
+    box-shadow: none;
+    transform: none !important;
+}
+
+.form-footer { 
+    margin-top: 40px; border-top: 1px solid #1a1a1a; padding-top: 30px;
+    display: flex; justify-content: space-between; align-items: center;
+}
+
+.btn-delete-link {
+    background: none; border: none; color: #444; font-size: 10px;
+    letter-spacing: 1px; cursor: pointer; transition: 0.3s;
+    text-decoration: underline;
+}
+.btn-delete-link:hover { color: #ff4444; }
+
+[x-cloak] { display: none !important; }
+
+@media (max-width: 768px) {
+    .form-layout { grid-template-columns: 1fr; justify-items: center; }
+    .fields-section { width: 100%; }
+    .form-footer { flex-direction: column; gap: 20px; text-align: center; }
+}
+</style>

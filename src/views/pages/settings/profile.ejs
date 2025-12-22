@@ -1,0 +1,73 @@
+<div class="settings-container" x-data="{ 
+    preview: '<%= user.avatarUrl || '/assets/default-avatar.png' %>',
+    avatarAction: 'keep'
+}">
+    <h1 class="page-title">НАСТРОЙКИ ПРОФИЛЯ</h1>
+
+    <div class="settings-layout">
+        <aside class="settings-sidebar">
+            <div class="avatar-upload-section">
+                <div class="avatar-wrapper">
+                    <label class="avatar-dropzone" :class="{ 'has-preview': preview && !preview.includes('default') }">
+                        <img :src="preview" class="avatar-preview-img">
+                        <input type="file" name="avatar" form="profileForm" accept="image/*" class="hidden-input" x-ref="avatarInput"
+                               @change="const file = $event.target.files[0]; if (file) { preview = URL.createObjectURL(file); avatarAction='update' }">
+                        <div class="dropzone-overlay"><span>ИЗМЕНИТЬ</span></div>
+                    </label>
+                    <button type="button" x-show="preview && !preview.includes('default')" 
+                            @click="preview = '/assets/default-avatar.png'; avatarAction = 'delete'; $refs.avatarInput.value = ''" 
+                            class="btn-clear-image">✕</button>
+                </div>
+            </div>
+
+            <nav class="settings-nav">
+                <a href="/settings/profile" class="nav-item active">ПРОФИЛЬ</a>
+                <a href="/settings/privacy" class="nav-item">ПРИВАТНОСТЬ</a>
+                <a href="/settings/account" class="nav-item">АККАУНТ</a>
+            </nav>
+        </aside>
+
+        <main class="settings-main">
+            <form action="/settings/profile" method="POST" enctype="multipart/form-data" id="profileForm" class="modern-form">
+                <input type="hidden" name="avatar_action" :value="avatarAction">
+                
+                <div class="form-group">
+                    <label>ПУБЛИЧНОЕ ИМЯ</label>
+                    <input type="text" name="publicName" value="<%= user.publicName %>" required maxlength="50">
+                </div>
+
+                <div class="form-group">
+                    <label>О СЕБЕ / БИОГРАФИЯ</label>
+                    <textarea name="bio" rows="8" maxlength="1000" placeholder="Расскажите о себе..."><%= user.bio || '' %></textarea>
+                </div>
+
+                <div class="form-footer">
+                    <button type="submit" class="btn">СОХРАНИТЬ ИЗМЕНЕНИЯ</button>
+                </div>
+            </form>
+        </main>
+    </div>
+</div>
+
+<style>
+.settings-container { max-width: 1000px; min-height: 752px; margin: 40px auto; padding: 0 24px; }
+.page-title { font-size: 28px; letter-spacing: 4px; margin-bottom: 40px; color: var(--text-main); }
+.settings-layout { display: grid; grid-template-columns: 250px 1fr; gap: 60px; }
+.settings-sidebar { display: flex; flex-direction: column; gap: 40px; }
+.avatar-wrapper { position: relative; width: 200px; height: 200px; margin-bottom: 20px; }
+.avatar-dropzone { width: 200px; height: 200px; border: var(--border-hard); cursor: pointer; overflow: hidden; position: relative; display: block; }
+.avatar-preview-img { width: 100%; height: 100%; object-fit: cover; }
+.dropzone-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; opacity: 0; transition: 0.3s; color: var(--accent); font-size: 10px; letter-spacing: 2px; }
+.avatar-dropzone:hover .dropzone-overlay { opacity: 1; }
+.settings-nav { display: flex; flex-direction: column; border-left: 1px solid #1a1a1a; }
+.nav-item { padding: 12px 20px; font-size: 11px; letter-spacing: 2px; color: var(--text-muted); transition: 0.3s; border-left: 2px solid transparent; margin-left: -1px; }
+.nav-item:hover { color: var(--accent); }
+.nav-item.active { color: var(--accent); border-left-color: var(--accent); background: linear-gradient(to right, rgba(198,27,77,0.05), transparent); }
+.modern-form .form-group { margin-bottom: 30px; }
+.modern-form label { display: block; font-size: 10px; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 10px; }
+.modern-form input, .modern-form textarea { width: 100%; background: #050505; border: 1px solid #1a1a1a; padding: 15px; color: #fff; font-family: inherit; transition: 0.3s; }
+.modern-form input:focus, .modern-form textarea:focus { border-color: var(--accent); outline: none; }
+.form-footer { margin-top: 40px; padding-top: 30px; border-top: 1px solid #1a1a1a; }
+.hidden-input { display: none; }
+.btn-clear-image { position: absolute; top: -10px; right: -10px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #000; border: none; cursor: pointer; font-size: 12px; z-index: 5; display: flex; align-items: center; justify-content: center; }
+</style>

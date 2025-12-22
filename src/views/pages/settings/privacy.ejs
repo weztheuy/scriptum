@@ -1,0 +1,69 @@
+<div class="settings-container">
+    <h1 class="page-title">НАСТРОЙКИ ПРИВАТНОСТИ</h1>
+
+    <div class="settings-layout">
+        <aside class="settings-sidebar">
+            <div class="avatar-upload-section" style="visibility: hidden; height: 220px;"></div>
+
+            <nav class="settings-nav">
+                <a href="/settings/profile" class="nav-item">ПРОФИЛЬ</a>
+                <a href="/settings/privacy" class="nav-item active">ПРИВАТНОСТЬ</a>
+                <a href="/settings/account" class="nav-item">АККАУНТ</a>
+            </nav>
+        </aside>
+
+        <main class="settings-main">
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 40px; line-height: 1.8; letter-spacing: 1px;">
+                УПРАВЛЯЙТЕ ВИДИМОСТЬЮ ВАШИХ СПИСКОВ В ПУБЛИЧНОМ ПРОФИЛЕ.
+            </p>
+
+            <form action="/settings/privacy" method="POST" enctype="multipart/form-data" class="modern-form">
+                <% 
+                    const shelfNames = { 'reading': 'ЧИТАЮ', 'completed': 'ПРОЧИТАНО', 'bookmarks': 'ЗАКЛАДКИ' };
+                %>
+                
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <% userShelves.forEach(shelf => { %>
+                        <div x-data="{ isPublic: <%= shelf.isPublic %> }">
+                            <input type="hidden" :name="'shelf_' + <%= shelf.id %>" :value="isPublic">
+                            <label style="margin-bottom: 10px; display: block;"><%= shelfNames[shelf.shelfType] || 'КОЛЛЕКЦИЯ' %></label>
+                            
+                            <div class="visibility-toggle" @click="isPublic = !isPublic" :class="isPublic ? 'is-active' : ''">
+                                <div class="toggle-track">
+                                    <div class="toggle-dot"></div>
+                                </div>
+                                <span x-text="isPublic ? 'ПУБЛИЧНАЯ (ВИДЯТ ВСЕ)' : 'ПРИВАТНАЯ (СКРЫТО)'"></span>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+
+                <div class="form-footer">
+                    <button type="submit" class="btn">СОХРАНИТЬ НАСТРОЙКИ</button>
+                </div>
+            </form>
+        </main>
+    </div>
+</div>
+
+<style>
+/* Используй те же стили, что в profile.ejs */
+.settings-container { max-width: 1000px; min-height: 752px; margin: 40px auto; padding: 0 24px; }
+.page-title { font-size: 28px; letter-spacing: 4px; margin-bottom: 40px; color: var(--text-main); }
+.settings-layout { display: grid; grid-template-columns: 250px 1fr; gap: 60px; }
+.settings-sidebar { display: flex; flex-direction: column; gap: 40px; }
+.settings-nav { display: flex; flex-direction: column; border-left: 1px solid #1a1a1a; }
+.nav-item { padding: 12px 20px; font-size: 11px; letter-spacing: 2px; color: var(--text-muted); transition: 0.3s; border-left: 2px solid transparent; margin-left: -1px; }
+.nav-item:hover { color: var(--accent); }
+.nav-item.active { color: var(--accent); border-left-color: var(--accent); background: linear-gradient(to right, rgba(198,27,77,0.05), transparent); }
+.form-footer { margin-top: 40px; padding-top: 30px; border-top: 1px solid #1a1a1a; }
+
+/* Стили тумблера */
+.visibility-toggle { display: flex; align-items: center; gap: 15px; background: #050505; border: 1px solid #1a1a1a; padding: 12px 15px; cursor: pointer; transition: 0.3s; }
+.visibility-toggle.is-active { border-color: var(--accent); color: #fff; }
+.visibility-toggle span { font-size: 11px; letter-spacing: 1px; color: #888; }
+.visibility-toggle.is-active span { color: #fff; }
+.toggle-track { width: 34px; height: 18px; background: #222; position: relative; border-radius: 20px; }
+.toggle-dot { width: 14px; height: 14px; background: #444; position: absolute; top: 2px; left: 2px; transition: 0.3s; border-radius: 50%; }
+.is-active .toggle-dot { left: 18px; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+</style>
