@@ -1355,7 +1355,13 @@ fastify.delete('/comments/:id', async (request, reply) => {
     return reply.send({ success: true });
 });
 
-fastify.listen({ port: 3000 }, (err) => {
-    if (err) throw err;
-    console.log('Сервер запущен: http://localhost:3000');
+fastify.listen({ 
+  port: process.env.PORT || 3000, 
+  host: '0.0.0.0' 
+}, (err) => {
+  if (err) {
+    fastify.log.error(err);
+    process.exit(1);
+  }
+  console.log('Сервер запущен');
 });
